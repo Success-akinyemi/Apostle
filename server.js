@@ -9,6 +9,7 @@ import cors from 'cors';
 
 //IMPORT ROUTES
 import authRoute from './routes/auth.routes.js';
+import adminRoute from './routes/admin.routes.js';
 import userRoute from './routes/user.routes.js';
 import categoryRoute from './routes/categories.routes.js';
 import songRoute from './routes/song.routes.js';
@@ -68,7 +69,7 @@ app.use('/api/auth', authRoute);
 app.use('/api/user', userRoute);
 app.use('/api/category', categoryRoute);
 app.use('/api/song', songRoute);
-
+app.use('/api/admin', adminRoute)
 
 
 

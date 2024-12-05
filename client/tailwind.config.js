@@ -7,7 +7,8 @@ export default {
     theme: {
       extend: {
         colors: {
-          'primary-color': '#000080',
+          'primary-color': '#0081C9',
+          'primary-hover': '#005F99',
           'second-color': '#4169E1',
           'second-color-hover': '#7f9efa',
           'second-color-opa': '#4169e159',
@@ -28,12 +29,6 @@ export default {
           'error': '#EE5D50',
           'success': '#2DAE32',
           'warning': '#FFB547',
-  
-          'color-2': '#3C517C',
-          'color-3': '#A9BADA',
-          'color-4': '#6882B6',
-  
-          'black-1': "#1C1C1C1A",
   
           'custom-gradient': 'linear-gradient(to bottom, rgba(215, 225, 244, 0) 0%, #D7E1F4 100%)',
           'gradient-2': 'linear-gradient(to right, #4169E1 100%, #000080 100%)',

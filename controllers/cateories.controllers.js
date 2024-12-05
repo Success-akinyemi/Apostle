@@ -1,4 +1,5 @@
 import CategoryModel from "../model/Categories.js";
+import SongModel from "../model/Song.js";
 
 export async function createCategory(req, res) {
     const { name } = req.body
@@ -38,6 +39,14 @@ export async function updateCategory(req, res) {
         findCat.name = name
         findCat.slug = slugValue
         await findCat.save()
+
+        const songs = await SongModel.find({ category: { $in: [oldCategory] } });
+
+        // Update the category in each song
+        await Promise.all(songs.map(async (song) => {
+            song.category = song.category.map(cat => cat === oldCategory ? category : cat);
+            await song.save();
+        }));
         
         res.status(200).json({ success: true, data: `Category updated successful` })
     } catch (error) {

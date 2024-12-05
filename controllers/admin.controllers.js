@@ -1,10 +1,10 @@
 import { registerMail } from "../middleware/sendEmail.js"
 import { generateOtp } from "../middleware/utils.js"
+import AdminModel from "../model/Admin.js"
 import OtpModel from "../model/Otp.js"
-import UserModel from "../model/User.js"
 
 export async function register(req, res) {
-    const { email, password, name } = req.body
+    const { email, password, name, phoneNumber } = req.body
     if(!name){
         return res.status(400).json({ success: false, data: 'Provide a name'})
     }
@@ -29,11 +29,15 @@ export async function register(req, res) {
     if (!specialChars.test(password)) {
         return res.status(400).json({ success: false, data: 'Passwords must contain at least one special character' });
     }
+    if(!phoneNumber){
+        return res.status(400).json({ success: false, data: 'Password is required'})
+    }
     try {
-        const newUser = await UserModel.create({
+        const newUser = await AdminModel.create({
             name: typeof name === 'string' ? name.trim() : name,
             email, 
-            password
+            password,
+            phoneNumber
         })
 
         const otpCode = await generateOtp(newUser._id, newUser.email)
@@ -74,7 +78,7 @@ export async function verifyOtp(req, res) {
         if(!getOtp){
             return res.status(404).json({ success: false, data: 'Invalid code' })
         }  
-        const getUser = await UserModel.findOne({ email: getOtp.email })
+        const getUser = await AdminModel.findOne({ email: getOtp.email })
         getUser.verified = true
         await getUser.save()
 
@@ -91,7 +95,7 @@ export async function resendOtp(req, res) {
         return res.status(400).json({ success: false, data: 'Email Address is required'})
     }
     try {
-        const getUser = await UserModel.findOne({ email })
+        const getUser = await AdminModel.findOne({ email })
         if(!getUser){
             return res.status(404).json({ success: false, data: 'User with does not exist please sign up' })
         }
@@ -132,7 +136,7 @@ export async function resendOtp(req, res) {
 export async function login(req, res) {
     const { email, password } = req.body;
     try {
-        const getUser = await UserModel.findOne({ email });
+        const getUser = await AdminModel.findOne({ email });
         if (!getUser) {
             return res.status(404).json({ success: false, data: 'User with email does not exist' });
         }
@@ -142,6 +146,8 @@ export async function login(req, res) {
             return res.status(401).json({ success: false, data: 'Invalid credentials' });
         }
 
+        /**
+         * 
         if (!getUser.verified) {
             const otpExist = await OtpModel.findOne({ email });
             if (!otpExist) {
@@ -169,26 +175,27 @@ export async function login(req, res) {
                 }
             }
         }
+         */
 
         // Generate Tokens
         const accessToken = getUser.getAccessToken()
         const refreshToken = getUser.getRefreshToken()
 
         // Set cookies
-        res.cookie('apostolicaccesstoken', accessToken, {
+        res.cookie('apostolicadminaccesstoken', accessToken, {
             httpOnly: true,
             sameSite: 'None',
             secure: true,
             maxAge: 15 * 60 * 1000, // 15 minutes
         });
-        res.cookie('apostolictoken', refreshToken, {
+        res.cookie('apostolicadminaccesstoken', refreshToken, {
             httpOnly: true,
             sameSite: 'None',
             secure: true,
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
-        const { password: hashedPassword, resetPasswordToken, resetPasswordExpire, ...userData } = getUser._doc;
+        const { password: hashedPassword, resetPasswordToken, resetPasswordExpire, _id, ...userData } = getUser._doc;
         res.status(200).json({ success: true, token: refreshToken, data: userData });
     } catch (error) {
         console.log('UNABLE TO LOGIN USER', error);
@@ -202,7 +209,7 @@ export async function forgotPassword(req, res) {
         return res.status(400).json({ success: false, data: 'Provide an email address' })
     }
     try {
-        const getUser = await UserModel.findOne({ email })
+        const getUser = await AdminModel.findOne({ email })
         if(!getUser){
             return res.status(404).json({ success: false, data: 'Email does not exist' })
         }
@@ -240,7 +247,7 @@ export async function resetPassword(req, res) {
             return res.status(404).json({ success: false, data: 'Invalid code' })
         }  
 
-        const getUser = await UserModel.findOne({ email: getOtp.email })
+        const getUser = await AdminModel.findOne({ email: getOtp.email })
         getUser.password = password
         await getUser.save()
 

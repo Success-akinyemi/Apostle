@@ -51,6 +51,29 @@ paths:
         500: 
           description: Server error
 
+  /api/auth/resendOtp:
+    post:
+      summary: Resend Verification OTP 
+      description: Resend Verification OTP to user email address with otp code
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - email
+            properties:
+              email:
+                type: string
+      responses:
+        201: 
+          description: success
+        400:
+          description: User error
+        500: 
+          description: Server error
+
   /api/auth/verifyOtp:
     post:
       summary: Verify OTP 

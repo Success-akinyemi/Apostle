@@ -4,13 +4,10 @@ import { FaEyeSlash } from "react-icons/fa";
 import Button from "../Components/Button";
 import LoadingBtn from "../Components/LoadingBtn";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../Helpers/apis";
+import { signup } from "../Helpers/apis";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { signInSuccess } from "../Redux/admin/adminSlice";
 
-function Login() {
-    const dispatch = useDispatch()
+function Signup() {
     const navigate = useNavigate()
     const [ showPassword, setShowPassword ] = useState()
     const [ formData, setFormData ] = useState({})
@@ -24,16 +21,13 @@ function Login() {
     }
 
     const [ loading, setLoading ] = useState(false)
-    const handleLogin = async () => {
+    const handleSignup = async () => {
         try {
             setLoading(true)
-            const res = await login(formData)
-            //console.log('RESz', res)
+            const res = await signup(formData)
             if(res.success){
-                toast.success('Login Success1')
-                localStorage.setItem('apostletoken', res?.token)
-                dispatch(signInSuccess(res?.data))
-                navigate('/dashboard')
+                toast.success('Signup Successful')
+                navigate('/login')
             } else {
                 toast.error(res.data)
             }
@@ -48,8 +42,16 @@ function Login() {
         <div className="w-[500px] bg-white pad rounded-[10px] phone:w-[90%] flex flex-col gap-8">
             <h1 className="text-center text-[28px] text-primary-color font-semibold" >Apostle Music App</h1>
             <div className="inputGroup">
+                <label className="label">Name</label>
+                <input type="text" id="name" onChange={handleChange} className="input" placeholder="Enter Full Name" />
+            </div>
+            <div className="inputGroup">
                 <label className="label">Email</label>
                 <input type="text" id="email" onChange={handleChange} className="input" placeholder="Enter Email Address" />
+            </div>
+            <div className="inputGroup">
+                <label className="label">Phone Number</label>
+                <input type="text" id="phoneNumber" onChange={handleChange} className="input" placeholder="Enter Phone Number" />
             </div>
             <div className="inputGroup">
                 <label className="label">Password</label>
@@ -74,14 +76,14 @@ function Login() {
                 loading ? (
                     <LoadingBtn />
                 ) : (
-                    <Button onClick={handleLogin} text={'Login'} />
+                    <Button onClick={handleSignup} text={'Create Account'} />
                 )
             }
 
-            <p>New User? <Link to={'/create-account'} className="text-primary-color">Create Account</Link></p>
+            <p>Already Have an Account? <Link to={'/login'} className="text-primary-color">Login Here</Link></p>
         </div>
     </div>
   )
 }
 
-export default Login
+export default Signup

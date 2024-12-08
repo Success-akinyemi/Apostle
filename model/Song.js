@@ -1,9 +1,22 @@
 import mongoose from "mongoose";
 
 const SongSchema = new mongoose.Schema({
+    trackImg: {
+        type: String,
+        required: [true, 'Provide a cover image for track']
+    },
     title: {
         type: String,
         required: [true, 'Song Title is required']
+    },
+    author: {
+        type: String,
+        required: [true, 'Song Author is required']
+    },
+    trackId: {
+        type: String,
+        required: [true, 'track Id is required'],
+        unique: [ true, 'Track Id must be unique']
     },
     description: {
         type: String,

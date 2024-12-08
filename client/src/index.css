@@ -50,3 +50,21 @@
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+/* Custom scrollbar styles */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #D7E1f4; /* Track color */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #6C737F; /* Handle color */
+  border-radius: 10px; /* Rounded corners */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #929292; /* Handle hover color */
+}

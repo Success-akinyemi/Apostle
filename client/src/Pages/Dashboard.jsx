@@ -3,7 +3,7 @@ import CategoryList from "../Components/CategoryList"
 import Navbar from "../Components/Navbar"
 import SongList from "../Components/SongList"
 
-function Dashboard({ setSelectedCard }) {
+function Dashboard({ setSelectedCard, setCategoryId, setSongId }) {
   return (
     <div className="flex flex-col">
       <Navbar />
@@ -21,12 +21,12 @@ function Dashboard({ setSelectedCard }) {
             
             {/**BODY */}
             <div className="flex mt-12 items-center gap-12 justify-between">
-                <div className="flex flex-7 w-full">
-                    <SongList />
+                <div className="flex flex-[7] w-full">
+                    <SongList setSongId={setSongId} setSelectedCard={setSelectedCard} />
                 </div>
 
-                <div className="flex flex-3 w-full">
-                    <CategoryList />
+                <div className="flex flex-[3] w-full">
+                    <CategoryList setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} />
                 </div>
             </div>
         </div>

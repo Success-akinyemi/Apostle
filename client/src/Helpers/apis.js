@@ -51,3 +51,77 @@ export async function updateCategory(formData){
         return res
     }
 }
+
+export async function deleteCategory({ id }){
+    try {
+        const res = await axios.post('/category/deleteCategory', { id }, {withCredentials: true})
+        if(res.data.success){
+            return res.data
+        }
+    } catch (error) {
+        const res = error.response.data || { data: 'Unable to delete category'}
+        return res
+    }
+}
+
+//new song
+export async function newSong(formData){
+    try {
+        const res = await axios.post(
+            '/song/newSong',
+            formData,
+            { 
+              withCredentials: true,
+              headers: { "Content-Type": "multipart/form-data" }
+            }
+          );
+        if(res.data.success){
+            return res.data
+        }
+    } catch (error) {
+        const res = error.response.data || { data: 'Unable to create new song'}
+        return res
+    }
+}
+
+//update song
+export async function updateSong(formData){
+    try {
+        const res = await axios.post(
+            '/song/updateSong',
+            formData,
+            { 
+              withCredentials: true,
+              headers: { "Content-Type": "multipart/form-data" }
+            }
+          );
+        if(res.data.success){
+            return res.data
+        }
+    } catch (error) {
+        const res = error.response.data || { data: 'Unable to update song'}
+        return res
+    }
+}
+
+//delete song
+export async function deleteSong({ id }){
+    console.log('object axios', id)
+
+    try {
+        const res = await axios.post(
+            '/song/deleteSongs',
+            { id },
+            { 
+              withCredentials: true,
+              //headers: { "Content-Type": "multipart/form-data" }
+            }
+          );
+        if(res.data.success){
+            return res.data
+        }
+    } catch (error) {
+        const res = error.response.data || { data: 'Unable to delete song'}
+        return res
+    }
+}

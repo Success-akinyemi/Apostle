@@ -25,3 +25,4 @@ export async function getUser(req, res) {
         res.status(500).json({ success: false, data: 'Unable to get users' })
     }
 }
+

@@ -1,3 +1,4 @@
+import './App.css'
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Signup from "./Pages/Signup"
 import Login from "./Pages/Login"
@@ -5,13 +6,19 @@ import Dashboard from "./Pages/Dashboard"
 import { Toaster } from "react-hot-toast"
 import { useState } from "react"
 import Category from "./Modals/Category"
+import Song from "./Modals/Song"
+import { AuthorizeUser } from './Auth/ProtectRoute'
 
 function App() {
   const [ selectedCard, setSelectedCard ] = useState()
   const [ categoryId, setCategoryId ] = useState()
+  const [ songId, setSongId ] = useState()
+
 
   const closePopup = () => {
     setSelectedCard(null);
+    setCategoryId()
+    setSongId()
   };
 
   const renderPopup = () => {
@@ -20,6 +27,12 @@ function App() {
         return (
           <div>
             <Category categoryId={categoryId} setSelectedCard={setSelectedCard} closePopup={closePopup} />
+          </div>
+        )
+      case 'song' :
+        return (
+          <div>
+            <Song songId={songId} closePopup={closePopup} setSelectedCard={setSelectedCard} />
           </div>
         ) 
     }
@@ -47,7 +60,9 @@ function App() {
           <Route path="/*" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/create-account" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard setSelectedCard={setSelectedCard} />} />
+          <Route element={<AuthorizeUser />}>
+            <Route path="/dashboard" element={<Dashboard setSongId={setSongId} setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </>

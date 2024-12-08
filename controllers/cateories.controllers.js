@@ -27,37 +27,42 @@ export async function createCategory(req, res) {
 
 //UPDATE CATEGORY **
 export async function updateCategory(req, res) {
-    const { _id, name } = req.body
+    const { _id, name } = req.body;
+
     try {
-        const findCat = await CategoryModel.findById({ _id: _id })
-        if(!findCat){
-            res.status(404).json({ success: false, data: 'Category not found' })
+        const findCat = await CategoryModel.findOne({ slug: _id });
+        if (!findCat) {
+            return res.status(404).json({ success: false, data: 'Category not found' });
         }
 
-        const slugValue = name.replace(/\s+/g, '').toLowerCase();
+        const oldCategory = findCat.name;
 
-        findCat.name = name
-        findCat.slug = slugValue
-        await findCat.save()
+        const slugValue = name.replace(/\s+/g, '').toLowerCase();
+        findCat.name = name;
+        findCat.slug = slugValue;
+        await findCat.save();
 
         const songs = await SongModel.find({ category: { $in: [oldCategory] } });
 
-        // Update the category in each song
-        await Promise.all(songs.map(async (song) => {
-            song.category = song.category.map(cat => cat === oldCategory ? category : cat);
-            await song.save();
-        }));
-        
-        res.status(200).json({ success: true, data: `Category updated successful` })
+        await Promise.all(
+            songs.map(async (song) => {
+                song.category = song.category.map((cat) => 
+                    cat === oldCategory ? name : cat
+                );
+                await song.save();
+            })
+        );
+
+        res.status(200).json({ success: true, data: 'Category updated successfully' });
     } catch (error) {
-        console.log('UNABLE TO UPDATE CATEGORY', error)
-        res.status(500).json({ success: false, data: 'Unable to update category' })
+        console.error('UNABLE TO UPDATE CATEGORY', error);
+        res.status(500).json({ success: false, data: 'Unable to update category' });
     }
 }
 
 export async function getAllCategory(req, res) {
     try {
-        const allCategories = await CategoryModel.find()
+        const allCategories = await CategoryModel.find().select('-_id')
 
         res.status(200).json({ success: true, data: allCategories })
     } catch (error) {
@@ -72,7 +77,7 @@ export async function getCategory(req, res) {
         return res.status(400).json({ success: false, data: 'Provide a category Id' })
     }
     try {
-        const getCategory = await CategoryModel.findOne({ slug: categorySlug })
+        const getCategory = await CategoryModel.findOne({ slug: categorySlug }).select('-_id')
         if(!getCategory){
             return res.status(404).json({ success: false, data: 'Category does not exist' })
         }
@@ -81,5 +86,17 @@ export async function getCategory(req, res) {
     } catch (error) {
         console.log('UNABLE TO GET ALL CATEGORY', error)
         res.status(500).json({ success: false, data: 'Unable to get all category'})
+    }
+}
+
+export async function deleteCategory(req, res) {
+    const { id } = req.body
+    try {
+        const deleteCategory = await CategoryModel.findOneAndDelete({ slug: id })
+
+        res.status(201).json({ success: true, data: 'Category deleted successful' })
+    } catch (error) {
+        console.log('UNABLE TO DELETE CATEGORY', error)
+        res.status(500).json({ success: false, data: 'Unable to delete' })
     }
 }

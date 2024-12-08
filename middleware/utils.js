@@ -1,4 +1,5 @@
 import OtpModel from "../model/Otp.js";
+import SongModel from "../model/Song.js";
 
 export async function generateOtp(userId, email) {
     const generateOtp = () => {
@@ -22,4 +23,29 @@ export async function generateOtp(userId, email) {
     }).save();
 
     return otp; 
+}
+
+export async function generateUniqueCode(length) {
+    const courseSlug = () => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let slugCode = ''; 
+
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            slugCode += characters[randomIndex]; 
+        }
+
+        return slugCode;
+    };
+
+    let slugCode;
+    let exists = true;
+
+    while (exists) {
+        slugCode = courseSlug();
+        const existingCourse = await SongModel.findOne({ trackId: slugCode });
+        exists = existingCourse !== null; 
+    }
+
+    return slugCode;
 }

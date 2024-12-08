@@ -7,8 +7,7 @@ const router = express.Router()
 //POST ROUTES
 router.post('/createCategory', AuthenticateAdmin, controllers.createCategory)
 router.post('/updateCategory', AuthenticateAdmin, controllers.updateCategory)
-
-
+router.post('/deleteCategory', AuthenticateAdmin, controllers.deleteCategory)
 
 //GET ROUTES
 router.get('/getAllCategory', controllers.getAllCategory)

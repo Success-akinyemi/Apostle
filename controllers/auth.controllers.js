@@ -4,7 +4,7 @@ import OtpModel from "../model/Otp.js"
 import UserModel from "../model/User.js"
 
 export async function register(req, res) {
-    const { email, password, name } = req.body
+    const { email, password, name, phoneNumber } = req.body
     if(!name){
         return res.status(400).json({ success: false, data: 'Provide a name'})
     }
@@ -12,6 +12,9 @@ export async function register(req, res) {
         return res.status(400).json({ success: false, data: 'Invalid Name'})
     }
     if(!email){
+        return res.status(400).json({ success: false, data: 'Provide an Email address' })
+    }
+    if(!phoneNumber){
         return res.status(400).json({ success: false, data: 'Provide an Email address' })
     }
     if(!password){
@@ -30,10 +33,19 @@ export async function register(req, res) {
         return res.status(400).json({ success: false, data: 'Passwords must contain at least one special character' });
     }
     try {
+        const emailExist = await UserModel.findOne({ email })
+        if(emailExist){
+            return res.status(400).json({ success: false, data: 'Email Already Exist please use another' })
+        }
+        const phoneNumberExist = await UserModel.findOne({ phoneNumber })
+        if(phoneNumberExist){
+            return res.status(400).json({ success: false, data: 'Phone Number Exist please use another' })
+        }
         const newUser = await UserModel.create({
             name: typeof name === 'string' ? name.trim() : name,
             email, 
-            password
+            password,
+            phoneNumber
         })
 
         const otpCode = await generateOtp(newUser._id, newUser.email)
@@ -248,5 +260,15 @@ export async function resetPassword(req, res) {
     } catch (error) {
         console.log('UNABLE TO PROCESS RESET PASSWORD REQUEST', error)
         res.status(500).json({ success: false, data: 'Unable to process password reset' })
+    }
+}
+
+export async function logout(req, res) {
+    try {
+        res.clearCookie(`apostolicaccesstoken`)
+        res.clearCookie('apostolictoken').status(200).json({success: true, data: 'Signout success'})
+    } catch (error) {
+        console.log('UNABLE TO SIGNOUT USER', error)
+        res.status(500).json({ success: false, data: '' })
     }
 }

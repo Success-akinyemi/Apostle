@@ -25,12 +25,20 @@ function Login() {
 
     const [ loading, setLoading ] = useState(false)
     const handleLogin = async () => {
+        if(!formData?.email){
+            toast.error('Provide an email address')
+            return
+        }
+        if(!formData?.password){
+            toast.error('Provide a password')
+            return
+        }
         try {
             setLoading(true)
             const res = await login(formData)
             //console.log('RESz', res)
             if(res.success){
-                toast.success('Login Success1')
+                toast.success('Login Success')
                 localStorage.setItem('apostletoken', res?.token)
                 dispatch(signInSuccess(res?.data))
                 navigate('/dashboard')

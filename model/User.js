@@ -17,8 +17,6 @@ const UserSchema = new mongoose.Schema({
     },
     phoneNumber: {
         type: String,
-        required: [ true,  'Phone Number is required' ],
-        unique: [ true, 'Phone Number already exist' ]
     },
     verified: {
         type: Boolean,

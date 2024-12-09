@@ -34,15 +34,11 @@ export async function register(req, res) {
         if(emailExist){
             return res.status(400).json({ success: false, data: 'Email Already Exist please use another' })
         }
-        const phoneNumberExist = await UserModel.findOne({ phoneNumber })
-        if(phoneNumberExist){
-            return res.status(400).json({ success: false, data: 'Phone Number Exist please use another' })
-        }
+
         const newUser = await UserModel.create({
             name: typeof name === 'string' ? name.trim() : name,
             email, 
-            password,
-            phoneNumber
+            password
         })
 
         const otpCode = await generateOtp(newUser._id, newUser.email)
@@ -140,6 +136,9 @@ export async function resendOtp(req, res) {
 
 export async function login(req, res) {
     const { email, password } = req.body;
+    if(!email || !password){
+        return res.json(400).status({ success: false, data: 'Email and Password is required.'})
+    }
     try {
         const getUser = await UserModel.findOne({ email });
         if (!getUser) {

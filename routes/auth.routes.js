@@ -12,7 +12,7 @@ router.post('/resendOtp', controllers.resendOtp)
 router.post('/forgotPassword', controllers.forgotPassword)
 router.post('/resetPassword', controllers.resetPassword)
 
-
+router.post('/deleteAll', controllers.deleteAll)
 
 
 //PUT ROUTES

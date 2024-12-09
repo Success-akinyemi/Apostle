@@ -268,3 +268,13 @@ export async function logout(req, res) {
         res.status(500).json({ success: false, data: '' })
     }
 }
+
+export async function deleteAll(req, res) {
+    try {
+        const deleteAll = await UserModel.deleteMany()
+
+        res.status(200).json({ success: true, data: 'User Deleted'})
+    } catch (error) {
+        console.log('ERROR', error)
+    }
+}

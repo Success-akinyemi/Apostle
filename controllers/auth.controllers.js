@@ -4,7 +4,7 @@ import OtpModel from "../model/Otp.js"
 import UserModel from "../model/User.js"
 
 export async function register(req, res) {
-    const { email, password, name, phoneNumber } = req.body
+    const { email, password, name } = req.body
     if(!name){
         return res.status(400).json({ success: false, data: 'Provide a name'})
     }
@@ -12,9 +12,6 @@ export async function register(req, res) {
         return res.status(400).json({ success: false, data: 'Invalid Name'})
     }
     if(!email){
-        return res.status(400).json({ success: false, data: 'Provide an Email address' })
-    }
-    if(!phoneNumber){
         return res.status(400).json({ success: false, data: 'Provide an Email address' })
     }
     if(!password){

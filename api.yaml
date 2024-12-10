@@ -232,3 +232,209 @@ paths:
         500:
           description: Server Error
 
+  /api/song/getSongLyrics/:id:
+    get:
+      summary: Get a song lyrics requires trackId as parameter
+      description:  Get a song lyrics requires trackId as parameter
+      responses:
+        200:
+          description: Success
+        500:
+          description: Server Error
+
+  /api/song/getRecentPlays:
+    get:
+      summary: Get top recent played songs by user
+      description:  Get top recent played songs by user
+      responses:
+        200:
+          description: Success
+        500:
+          description: Server Error
+
+  /api/song/getQuickPicks:
+    get:
+      summary: Get quick picks randomly select songs for user
+      description:  Get quick picks randomly select songs for user
+      responses:
+        200:
+          description: Success
+        500:
+          description: Server Error
+
+  /api/song/getNewRelease:
+    get:
+      summary: Get New Release
+      description:  Get newly released songs
+      responses:
+        200:
+          description: Success
+        500:
+          description: Server Error
+
+  /api/song/getRecommended:
+    get:
+      summary: Get Recommendation
+      description:  Get songs recommendations for user based on user past histroy
+      responses:
+        200:
+          description: Success
+        500:
+          description: Server Error
+
+  /api/song/getSongWithQuery/:query:
+    get:
+      summary: Get songs with user search query
+      description:  Get songs with user search query
+      responses:
+        200:
+          description: Success
+        500:
+          description: Server Error         
+
+  /api/song/handleLike:
+    post:
+      summary: Handle Like of a song
+      description: Handle like or unlike of a song
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - trackId
+            properties:
+              trackId:
+                type: string
+      responses:
+        201: 
+          description: success - 
+        400:
+          description: User error
+        500: 
+          description: Server error
+   
+  /api/playlist/newPlayList:
+    post:
+      summary: Create new Play List
+      description: Create a new Play List by user
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+      responses:
+        201: 
+          description: success - New play list created
+        400:
+          description: User error
+        500: 
+          description: Server error
+         
+  /api/playlist/addToPlayList:
+    post:
+      summary: Add Track to play list 
+      description: Add new track to play list. requires playlist _id and trackId
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - _id
+              - trackId
+            properties:
+              _id:
+                type: string
+              trackId:
+                type: string
+      responses:
+        201: 
+          description: success - New track added to Play list
+        400:
+          description: User error
+        500: 
+          description: Server error
+                  
+  /api/playlist/deletePlayList:
+    post:
+      summary: Delete play list 
+      description: Delete a play list. requires playlist _id. note all songs in that play list would also be deleted
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - _id
+            properties:
+              _id:
+                type: string
+      responses:
+        201: 
+          description: success - Play list deleted
+        400:
+          description: User error
+        500: 
+          description: Server error
+                  
+  /api/playlist/removeTrackFromPlayList:
+    post:
+      summary: Remove a track from a user play list 
+      description: Remove a track from a user play list. requires playlist _id and trackId. 
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - _id
+              - trackId
+            properties:
+              _id:
+                type: string
+              trackId: 
+                type: string
+      responses:
+        201: 
+          description: success - Track removed from playlist
+        400:
+          description: User error
+        500: 
+          description: Server error
+                     
+  /api/playlist/getUserAllPlayList:
+    get:
+      summary: Get user play list
+      description:  Get all play list of a user
+      responses:
+        200:
+          description: Success
+        400:
+          description: User error
+        500:
+          description: Server Error
+
+  /api/playlist/getUserPlayList/:_id:
+    get:
+      summary: Get user play list
+      description:  Get a play list of a user and the play list details
+      responses:
+        200:
+          description: Success
+        400:
+          description: User error
+        500:
+          description: Server Error        
+
+          

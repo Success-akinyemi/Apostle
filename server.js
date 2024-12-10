@@ -13,7 +13,7 @@ import adminRoute from './routes/admin.routes.js';
 import userRoute from './routes/user.routes.js';
 import categoryRoute from './routes/categories.routes.js';
 import songRoute from './routes/song.routes.js';
-
+import PlayListRoute from './routes/playList.routes.js';
 
 
 
@@ -70,6 +70,8 @@ app.use('/api/user', userRoute);
 app.use('/api/category', categoryRoute);
 app.use('/api/song', songRoute);
 app.use('/api/admin', adminRoute)
+app.use('/api/playlist', PlayListRoute)
+
 
 
 

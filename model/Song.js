@@ -13,6 +13,9 @@ const SongSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Song Author is required']
     },
+    artists: {
+        type: Array
+    },
     trackId: {
         type: String,
         required: [true, 'track Id is required'],
@@ -37,8 +40,15 @@ const SongSchema = new mongoose.Schema({
     },
     lyrics: {
         type: String
+    },
+    likes: {
+        type: Array
     }
-})
+},
+{ timestamps: true}
+)
+
+SongSchema.index({ title: 'text' });
 
 const SongModel = mongoose.model('song', SongSchema)
 export default SongModel

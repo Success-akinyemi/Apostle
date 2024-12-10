@@ -7,7 +7,9 @@ const CategoriesSchema = new mongoose.Schema({
     slug: {
         type: String
     }
-})
+},
+{ timestamps: true},
+)
 
 const CategoryModel = mongoose.model('categories', CategoriesSchema)
 export default CategoryModel

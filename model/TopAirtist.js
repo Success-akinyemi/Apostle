@@ -9,7 +9,8 @@ const TopArtistSchema = new mongoose.Schema({
             name: '',
         }
     ]
-})
+},
+{ timestamps: true})
 
 const TopArtistModel = mongoose.model('topAirtist', TopArtistSchema)
 export default TopArtistModel

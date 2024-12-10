@@ -164,6 +164,18 @@ function Song({ setSelectedCard, closePopup, songId }) {
             </div>
 
             <div className="inputGroup">
+              <label className="label">Enter Artists</label>
+              <input
+                type="text"
+                id="artists"
+                onChange={handleChange}
+                placeholder="Enter all artists seprated by comma"
+                className="input"
+                defaultValue={data?.artists?.map((i) => (i, ','))}
+              />
+            </div>
+
+            <div className="inputGroup">
               <label className="label">Description</label>
               <ReactQuill
                 value={formData.description}

@@ -39,7 +39,7 @@ export const AuthenticateUser = async (req, res, next) => {
                     secure: true,
                     maxAge: 15 * 60 * 1000, // 15 minutes
                 });
-                req.user = { id: user._id };
+                req.user = user;
                 return next();
             } catch (refreshError) {
                 return res.status(403).json({ success: false, data: 'Invalid refresh token' });

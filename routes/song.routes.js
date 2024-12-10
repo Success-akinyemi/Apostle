@@ -10,10 +10,23 @@ const router = express.Router()
 router.post('/newSong', AuthenticateAdmin, uploadMiddleware, controllers.newSong)
 router.post('/updateSong', AuthenticateAdmin, uploadMiddleware, controllers.updateSong)
 router.post('/deleteSongs', AuthenticateAdmin, controllers.deleteSongs)
+router.post('/handleLike', AuthenticateUser, controllers.handleLike)
+
+//router.post('/deleteAm', controllers.deleteAm)
+
 
 //GET ROUTES
 router.get('/getAllSongs', AuthenticateUser, controllers.getAllSongs)
 router.get('/getASongs/:id', AuthenticateUser, controllers.getASongs)
+router.get('/getSongLyrics/:id', AuthenticateUser, controllers.getSongLyrics)
+router.get('/getRecentPlays', AuthenticateUser, controllers.getRecentPlays)
+router.get('/getQuickPicks', AuthenticateUser, controllers.getQuickPicks)
+router.get('/getNewRelease', AuthenticateUser, controllers.getNewRelease)
+router.get('/getRecommended', AuthenticateUser, controllers.getRecommended)
+router.get('/getSongWithQuery/:query', AuthenticateUser, controllers.getSongWithQuery)
+
+
+
 
 router.get('/getAdminAllSongs', AuthenticateAdmin, controllers.getAllSongs)
 router.get('/getAdminASongs/:id', AuthenticateAdmin, controllers.getASongs)

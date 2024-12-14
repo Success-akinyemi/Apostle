@@ -123,7 +123,7 @@ export async function getUserAllPlayList(req, res) {
 export async function getUserPlayList(req, res) {
     const { _id: playListId } = req.params
     const { _id } = req.user
-    if(!_id){
+    if(!playListId){
         return res.status(400).json({ success: false, data: 'Provide a Id'})
     }
     try {

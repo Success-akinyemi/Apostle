@@ -15,7 +15,8 @@ export const AuthenticateUser = async (req, res, next) => {
     try {
         // Validate the access token
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-        req.user = decoded;
+        const user = await UserModel.findById(decoded.id);
+        req.user = user;
         return next();
     } catch (error) {
         if (error.name === 'TokenExpiredError') {

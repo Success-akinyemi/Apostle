@@ -64,6 +64,7 @@ export const AuthenticateAdmin = async (req, res, next) => {
     try {
         // Validate the access token
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+        const user = await AdminModel.findById(decoded.id);
         req.user = decoded;
         return next();
     } catch (error) {

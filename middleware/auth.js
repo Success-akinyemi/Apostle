@@ -65,7 +65,7 @@ export const AuthenticateAdmin = async (req, res, next) => {
         // Validate the access token
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
         const user = await AdminModel.findById(decoded.id);
-        req.user = decoded;
+        req.user = user;
         return next();
     } catch (error) {
         if (error.name === 'TokenExpiredError') {

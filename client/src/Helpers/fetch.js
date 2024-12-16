@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from 'axios'
+import toast from "react-hot-toast";
 
 axios.defaults.baseURL = import.meta.env.VITE_SERVER_URL
 //axios.defaults.baseURL = 'https://apostle.onrender.com/api'
@@ -19,6 +20,8 @@ export function useFetchCategories(query){
                     setCategories({ isFetching: false, data: null, status: status, serverError: null})
                 }
             } catch (error) {
+                const errorMsg = error.response.data.data
+                toast.error(errorMsg || 'Request Failed')
                 setCategories({ isFetching: false, data: null, status: null, serverError: error})
             }
         }
@@ -29,25 +32,50 @@ export function useFetchCategories(query){
 }
 
 //FETCH SONGS
-export function useFetchSongs(query){
-    const [ songs, setSongs] = useState({ isFetching: true, data: null, status: null, serverError: null, })
+export function useFetchSongs({ page, limit }) {
+    const [songs, setSongs] = useState({
+        isFetching: true,
+        data: null,
+        status: null,
+        serverError: null,
+    });
+
     useEffect(() => {
         const fetchSongsData = async () => {
             try {
-                const { data, status} = !query ? await axios.get(`/song/getAdminAllSongs`, {withCredentials: true}) : await axios.get(`/song/getAdminASongs/${query}`, {withCredentials: true})
-                //console.log('Data from Hooks>>>', data, 'STATUS', status)
+                const { data, status } = await axios.get(
+                    `/song/getAdminAllSongs?page=${page}&limit=${limit}`,
+                    { withCredentials: true }
+                );
 
-                if(status === 200){
-                    setSongs({ isFetching: false, data: data, status: status, serverError: null})
-                } else{
-                    setSongs({ isFetching: false, data: null, status: status, serverError: null})
+                if (status === 200) {
+                    setSongs({
+                        isFetching: false,
+                        data: data,
+                        status: status,
+                        serverError: null,
+                    });
+                } else {
+                    setSongs({
+                        isFetching: false,
+                        data: null,
+                        status: status,
+                        serverError: null,
+                    });
                 }
             } catch (error) {
-                setSongs({ isFetching: false, data: null, status: null, serverError: error})
+                const errorMsg = error.response?.data?.data || "Request Failed";
+                toast.error(errorMsg);
+                setSongs({
+                    isFetching: false,
+                    data: null,
+                    status: null,
+                    serverError: error,
+                });
             }
-        }
-        fetchSongsData()
-    }, [query])
+        };
+        fetchSongsData();
+    }, [page, limit]); // Re-fetch data when `page` or `limit` changes
 
-    return songs
+    return songs;
 }

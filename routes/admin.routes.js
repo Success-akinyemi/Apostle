@@ -11,7 +11,7 @@ router.post('/verifyOtp', controllers.verifyOtp)
 router.post('/resendOtp', controllers.resendOtp)
 router.post('/forgotPassword', controllers.forgotPassword)
 router.post('/resetPassword', controllers.resetPassword)
-
+router.post('/logout', controllers.logout)
 
 
 

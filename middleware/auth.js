@@ -56,7 +56,7 @@ export const AuthenticateAdmin = async (req, res, next) => {
     const accessToken = req.cookies.apostolicadminaccesstoken;
     const refreshToken = req.cookies.apostolicadmintoken;
 
-    console.log('TOKENS', accessToken, refreshToken);
+    //console.log('TOKENS', accessToken, refreshToken);
 
     if (accessToken) {
         try {
@@ -98,5 +98,5 @@ export const AuthenticateAdmin = async (req, res, next) => {
     }
 
     // Both tokens are invalid or missing
-    return res.status(401).json({ success: false, data: 'Authentication required' });
+    return res.status(401).json({ success: false, data: 'Please Login' });
 };

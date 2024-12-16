@@ -8,7 +8,7 @@ import { useFetchCategories, useFetchSongs } from "../Helpers/fetch"
 function Dashboard({ setSelectedCard, setCategoryId, setSongId }) {
     const navigate = useNavigate()
     //top recent songs
-    const { data: songsData, isFetching: fetchingSongs } = useFetchSongs();
+    const { data: songsData, isFetching: fetchingSongs } = useFetchSongs({ page: 1, limit: 10 });
     const data = songsData?.data?.splice(0, 10);
     //top recent categories
     const { isFetching: fetchingCategories, data: categoriesData } = useFetchCategories();

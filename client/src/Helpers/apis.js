@@ -29,6 +29,19 @@ export async function login(formData){
     }
 }
 
+export async function logout(formData){
+    try {
+        const res = await axios.post('/admin/logout', formData, {withCredentials: true})
+        if(res.data.success){
+            return res.data
+        }
+    } catch (error) {
+        const res = error.response.data || 'Unable to logout user'
+        return res
+    }
+}
+
+
 //new category
 export async function newCategory(formData){
     try {

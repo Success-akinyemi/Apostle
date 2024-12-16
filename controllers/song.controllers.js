@@ -185,16 +185,28 @@ export async function getAllSongs(req, res) {
     }
 }
 
-//GET ALL SONGS FOR ADMIN
+// GET ALL SONGS FOR ADMIN WITH PAGINATION
 export async function getAdminAllSongs(req, res) {
-    try {
-        const songData = await SongModel.find()
+  try {
+      const { page = 1, limit = 10 } = req.query;
 
-        res.status(200).json({ success: true, data: songData })
-    } catch (error) {
-        console.log('UNABLE TO GET ALL SONGS', error)
-        res.status(500).json({ success: false, data: 'Unable to get all songs' })
-    }
+      const total = await SongModel.countDocuments();
+      const songData = await SongModel.find()
+          .sort({ updatedAt: -1 })
+          .skip((page - 1) * limit)
+          .limit(parseInt(limit));
+
+      res.status(200).json({
+          success: true,
+          data: songData,
+          total, 
+          currentPage: parseInt(page), 
+          totalPages: Math.ceil(total / limit), 
+      });
+  } catch (error) {
+      console.log('UNABLE TO GET ALL SONGS', error);
+      res.status(500).json({ success: false, data: 'Unable to get all songs' });
+  }
 }
 
 //GET A SONG

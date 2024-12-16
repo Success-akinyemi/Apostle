@@ -188,7 +188,7 @@ export async function login(req, res) {
             secure: true,
             maxAge: 15 * 60 * 1000, // 15 minutes
         });
-        res.cookie('apostolicadminaccesstoken', refreshToken, {
+        res.cookie('apostolicadmintoken', refreshToken, {
             httpOnly: true,
             sameSite: 'None',
             secure: true,
@@ -200,6 +200,16 @@ export async function login(req, res) {
     } catch (error) {
         console.log('UNABLE TO LOGIN USER', error);
         res.status(500).json({ success: false, data: 'Unable to login user' });
+    }
+}
+
+export async function logout(req, res) {
+    try {
+        res.clearCookie(`apostolicadminaccesstoken`)
+        res.clearCookie('apostolicadmintoken').status(200).json({success: true, data: 'Signout success'})
+    } catch (error) {
+        console.log('UNABLE TO SIGNOUT USER', error)
+        res.status(500).json({ success: false, data: '' })
     }
 }
 

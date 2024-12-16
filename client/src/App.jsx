@@ -8,6 +8,8 @@ import { useState } from "react"
 import Category from "./Modals/Category"
 import Song from "./Modals/Song"
 import { AuthorizeUser } from './Auth/ProtectRoute'
+import Songs from './Pages/Songs'
+import CategoryPage from './Pages/CategoryPage'
 
 function App() {
   const [ selectedCard, setSelectedCard ] = useState()
@@ -45,7 +47,7 @@ function App() {
               <>
                 <div className='popup-overlay z-40 fixed flex items-center justify-center top-0 left-0 w-[100vw] h-[100vh] bg-[#A59B9B4D] '>
                   <div className={`z-50 w-[551px] bg-white shadow-xl rounded-[12px] p-4`}>
-                    <div className='w-full'>
+                    <div className='w-full z-[99999]'>
                         {renderPopup()}
                     </div>
                   </div>
@@ -62,6 +64,12 @@ function App() {
           <Route path="/create-account" element={<Signup />} />
           <Route element={<AuthorizeUser />}>
             <Route path="/dashboard" element={<Dashboard setSongId={setSongId} setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} />} />
+          </Route>
+          <Route element={<AuthorizeUser />}>
+            <Route path="/songs" element={<Songs setSongId={setSongId} setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} />} />
+          </Route>
+          <Route element={<AuthorizeUser />}>
+            <Route path="/category" element={<CategoryPage setSongId={setSongId} setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} />} />
           </Route>
         </Routes>
       </BrowserRouter>

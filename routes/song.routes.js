@@ -28,8 +28,8 @@ router.get('/getSongWithQuery/:query', AuthenticateUser, controllers.getSongWith
 
 
 
-router.get('/getAdminAllSongs', AuthenticateAdmin, controllers.getAllSongs)
-router.get('/getAdminASongs/:id', AuthenticateAdmin, controllers.getASongs)
+router.get('/getAdminAllSongs', AuthenticateAdmin, controllers.getAdminAllSongs)
+router.get('/getAdminASongs/:id', AuthenticateAdmin, controllers.getAdminASongs)
 
 router.get('/getSongByCategory/:category', AuthenticateUser, controllers.getSongByCategory)
 

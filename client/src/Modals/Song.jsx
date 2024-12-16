@@ -48,7 +48,7 @@ function Song({ setSelectedCard, closePopup, songId }) {
   };
 
   useEffect(() => {
-    console.log("DATA", formData);
+    //console.log("DATA", formData);
   }, [formData]);
 
   const [loading, setLoading] = useState(false);
@@ -274,12 +274,15 @@ function Song({ setSelectedCard, closePopup, songId }) {
                 className="w-full h-[200px] mb-6"
               />
             </div>
+            
+            <div className="flex w-full phone:mt-12">
+              {loading ? (
+                <LoadingBtn />
+              ) : (
+                <Button onClick={songId && data ? handleUpdateSong : handleNewSong} text={"Save"}  />
+              )}
+            </div>
 
-            {loading ? (
-              <LoadingBtn />
-            ) : (
-              <Button onClick={songId && data ? handleUpdateSong : handleNewSong} text={"Save"} />
-            )}
           </div>
         )
       }

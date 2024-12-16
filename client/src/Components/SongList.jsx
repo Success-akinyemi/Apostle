@@ -1,14 +1,11 @@
 import { FaEdit } from "react-icons/fa";
-import { useFetchSongs } from "../Helpers/fetch";
 import { AiFillDelete } from "react-icons/ai";
 import Spinner from "./Spinner";
 import toast from "react-hot-toast";
 import { deleteSong } from "../Helpers/apis";
 import { useState } from "react";
 
-function SongList({ setSelectedCard, setSongId }) {
-  const { data: songsData, isFetching: fetchingSongs } = useFetchSongs();
-  const data = songsData?.data;
+function SongList({ data, loading: loadingData, setSelectedCard, setSongId }) {
 
   const [loading, setLoading] = useState(false);
   const handleDelete = async (id) => {
@@ -52,8 +49,8 @@ function SongList({ setSelectedCard, setSongId }) {
         <h2 className="h2 text-white">Song List</h2>
       </div>
 
-      <div className="overflow-y-auto h-full px-3 py-2 max-h-[100vh]">
-        {fetchingSongs ? (
+      <div className="overflow-auto h-full px-3 py-2 max-h-[100vh]">
+        {loadingData ? (
           <div className="flex items-center justify-center mt-2 mb-4">
             <Spinner style={`!text-[40px]`} />
           </div>
@@ -63,12 +60,12 @@ function SongList({ setSelectedCard, setSongId }) {
           <div>
             {/**Song details */}
             <div className="flex items-center gap-3">
-              <table className="w-full">
+              <table className="w-full tablet:overflow-x-auto">
                 <thead className="w-full">
-                  <tr className="w-full flex items-center justify-between">
+                  <tr className="w-full tablet:px-4 flex items-center justify-between">
                     <th className="flex flex-1 text-center">Title</th>
-                    <th className="flex flex-1 text-center">Author</th>
-                    <th className="flex flex-1 text-center">ID</th>
+                    <th className="flex flex-1 text-center tablet:hidden">Author</th>
+                    <th className="flex flex-1 text-center tablet:hidden">ID</th>
                     <th className="flex flex-1 text-center">Audio</th>
                     <th className="flex flex-1 text-end justify-end">Action</th>
                   </tr>
@@ -78,13 +75,13 @@ function SongList({ setSelectedCard, setSongId }) {
                   {data?.map((i, index) => (
                     <tr
                       key={index}
-                      className={`flex items-center justify-between py-2 gap-3 border-b-[1px] ${
+                      className={`flex items-center justify-between py-2 gap-3 border-b-[1px] tablet:px-3 ${
                         index === data.length - 1 ? "border-b-0" : ""
                       }`}
                     >
-                      <td className="flex flex-1 text-center">{truncateText(i?.title, 20)}</td>
-                      <td className="flex flex-1 text-center">{truncateText(i?.author, 15)}</td>
-                      <td className="flex flex-1 text-center">{i.trackId}</td>
+                      <td className="flex flex-1 text-center tablet:text-[14px]">{truncateText(i?.title, 20)}</td>
+                      <td className="flex flex-1 text-center tablet:hidden">{truncateText(i?.author, 15)}</td>
+                      <td className="flex flex-1 text-center tablet:hidden">{i.trackId}</td>
                       <td className="flex flex-1 text-center">
                         <audio controls src={i.trackUrl} />
                       </td>

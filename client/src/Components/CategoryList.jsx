@@ -1,4 +1,3 @@
-import { useFetchCategories } from "../Helpers/fetch";
 import Spinner from "./Spinner";
 import { FaEdit } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
@@ -6,9 +5,7 @@ import { useState } from "react";
 import { deleteCategory } from "../Helpers/apis";
 import toast from "react-hot-toast";
 
-function CategoryList({ setSelectedCard, setCategoryId }) {
-  const { isFetching: fetchingCategories, data: categoriesData } = useFetchCategories();
-  const cat = categoriesData?.data;
+function CategoryList({ data: cat, loading: loadingData, setSelectedCard, setCategoryId }) {
 
   const [ loading, setLoading ] = useState(false)
   const handleDelete = async ( id ) => {
@@ -48,7 +45,7 @@ function CategoryList({ setSelectedCard, setCategoryId }) {
 
       {/* List Container */}
       <div className="overflow-y-auto h-full px-3 py-2 max-h-[50vh]">
-        {fetchingCategories ? (
+        {loadingData ? (
           <div className="flex items-center justify-center mt-2 mb-4">
             <Spinner style={`!text-[40px]`} />
           </div>

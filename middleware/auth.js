@@ -28,7 +28,7 @@ export const AuthenticateUser = async (req, res, next) => {
         try {
             const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
             const user = await UserModel.findById(decodedRefresh.id);
-            if (!user || user.refreshToken !== refreshToken) {
+            if (!user) {
                 return res.status(403).json({ success: false, data: 'Invalid refresh token' });
             }
 
@@ -78,7 +78,7 @@ export const AuthenticateAdmin = async (req, res, next) => {
         try {
             const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
             const user = await AdminModel.findById(decodedRefresh.id);
-            if (!user || user.refreshToken !== refreshToken) {
+            if (!user) {
                 return res.status(403).json({ success: false, data: 'Invalid refresh token' });
             }
 

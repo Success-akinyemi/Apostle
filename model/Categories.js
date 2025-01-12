@@ -6,6 +6,9 @@ const CategoriesSchema = new mongoose.Schema({
     },
     slug: {
         type: String
+    },
+    categoryImg: {
+        type: String
     }
 },
 { timestamps: true},

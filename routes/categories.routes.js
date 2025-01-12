@@ -1,12 +1,13 @@
 import express from 'express'
 import * as controllers from '../controllers/cateories.controllers.js'
 import { AuthenticateAdmin, AuthenticateUser } from '../middleware/auth.js'
+import { uploadMiddleware } from '../controllers/cateories.controllers.js'
 
 const router = express.Router()
 
 //POST ROUTES
-router.post('/createCategory', AuthenticateAdmin, controllers.createCategory)
-router.post('/updateCategory', AuthenticateAdmin, controllers.updateCategory)
+router.post('/createCategory', AuthenticateAdmin, uploadMiddleware, controllers.createCategory)
+router.post('/updateCategory', AuthenticateAdmin, uploadMiddleware, controllers.updateCategory)
 router.post('/deleteCategory', AuthenticateAdmin, controllers.deleteCategory)
 
 //GET ROUTES

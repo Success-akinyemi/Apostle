@@ -5,7 +5,7 @@ import { useState } from "react";
 import { deleteCategory } from "../Helpers/apis";
 import toast from "react-hot-toast";
 
-function CategoryList({ data: cat, loading: loadingData, setSelectedCard, setCategoryId }) {
+function CategoryList({ data: cat, loading: loadingData, setSelectedCard, setCategoryId, style, cardStyle }) {
 
   const [ loading, setLoading ] = useState(false)
   const handleDelete = async ( id ) => {
@@ -37,14 +37,14 @@ function CategoryList({ data: cat, loading: loadingData, setSelectedCard, setCat
   }
 
   return (
-    <div className="w-full rounded-[8px] overflow-hidden max-h-[50vh] border-[3px] border-primary-color">
+    <div className={`w-full rounded-[8px] overflow-hidden max-h-[50vh] border-[3px] border-primary-color ${style}`}>
       {/* Header */}
       <div className="flex w-full p-3 bg-primary-color">
         <h2 className="h2 text-white">Categories</h2>
       </div>
 
       {/* List Container */}
-      <div className="overflow-y-auto h-full px-3 py-2 max-h-[50vh]">
+      <div className={`overflow-y-auto h-full px-3 py-2 max-h-[50vh] ${cardStyle}`}>
         {loadingData ? (
           <div className="flex items-center justify-center mt-2 mb-4">
             <Spinner style={`!text-[40px]`} />

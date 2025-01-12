@@ -26,7 +26,7 @@ export const AuthenticateUser = async (req, res, next) => {
     // Handle missing or expired access token
     if (refreshToken) {
         try {
-            const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+            const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_SECRET);
             const user = await UserModel.findById(decodedRefresh.id);
             if (!user) {
                 return res.status(403).json({ success: false, data: 'Invalid refresh token' });
@@ -76,8 +76,9 @@ export const AuthenticateAdmin = async (req, res, next) => {
     // Handle missing or expired access token
     if (refreshToken) {
         try {
-            const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+            const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_SECRET);
             const user = await AdminModel.findById(decodedRefresh.id);
+            //console.log('object', decodedRefresh, user)
             if (!user) {
                 return res.status(403).json({ success: false, data: 'Invalid refresh token' });
             }
@@ -93,6 +94,7 @@ export const AuthenticateAdmin = async (req, res, next) => {
             req.user = user;
             return next();
         } catch (refreshError) {
+            console.log('ERROR', refreshError)
             return res.status(403).json({ success: false, data: 'Invalid refresh token' });
         }
     }

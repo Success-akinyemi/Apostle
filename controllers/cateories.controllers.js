@@ -1,12 +1,49 @@
+import cloudinary from "cloudinary";
+import multer from "multer";
+import fs from "fs";
 import CategoryModel from "../model/Categories.js";
 import SongModel from "../model/Song.js";
 
+cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+  
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+      cb(null, `${Date.now()}-${file.originalname}`);
+    },
+  });
+  
+  const upload = multer({ storage });
+  
+  export const uploadMiddleware = upload.fields([
+    { name: "categoryImg", maxCount: 1 },
+  ]);
+
 export async function createCategory(req, res) {
     const { name } = req.body
+    const { categoryImg } = req.files || {}; 
     if(!name){
         return res.status(400).json({ success: false, data: 'Provide category a name'})
     }
     try {
+        let categoryImgUrl
+
+        // Upload Category Image (Image) if provided
+        if (categoryImg && categoryImg[0]?.path) {
+            const imageUpload = await cloudinary.v2.uploader.upload(categoryImg[0]?.path, {
+              resource_type: "image",
+              folder: "category/images",
+            });
+            categoryImgUrl = imageUpload.secure_url;
+            fs.unlinkSync(categoryImg[0].path);
+        }
+
         const slugValue = name.replace(/\s+/g, '').toLowerCase();
 
         const categoryExist =  await CategoryModel.findOne({ slug: slugValue })
@@ -15,7 +52,7 @@ export async function createCategory(req, res) {
         }
 
         const makeNewCategory = await CategoryModel.create({
-            name, slug: slugValue
+            name, slug: slugValue, categoryImg: categoryImgUrl
         })
 
         res.status(201).json({ success: true, data: `${makeNewCategory.name} category has been added` })
@@ -28,8 +65,24 @@ export async function createCategory(req, res) {
 //UPDATE CATEGORY **
 export async function updateCategory(req, res) {
     const { _id, name } = req.body;
+    const { categoryImg } = req.files || {}; 
 
+    if(!name && !categoryImg){
+        return res.status(203).json({ success: false, data: 'No changes made'})
+    }
     try {
+        let categoryImgUrl
+        
+        // Upload Category Image (Image) if provided
+        if (categoryImg && categoryImg[0]?.path) {
+            const imageUpload = await cloudinary.v2.uploader.upload(categoryImg[0]?.path, {
+              resource_type: "image",
+              folder: "category/images",
+            });
+            categoryImgUrl = imageUpload.secure_url;
+            fs.unlinkSync(categoryImg[0].path);
+        }
+
         const findCat = await CategoryModel.findOne({ slug: _id });
         if (!findCat) {
             return res.status(404).json({ success: false, data: 'Category not found' });
@@ -37,9 +90,14 @@ export async function updateCategory(req, res) {
 
         const oldCategory = findCat.name;
 
-        const slugValue = name.replace(/\s+/g, '').toLowerCase();
-        findCat.name = name;
-        findCat.slug = slugValue;
+        let slugValue
+        if(name){
+            slugValue = name.replace(/\s+/g, '').toLowerCase();
+        }
+        
+        if(name) findCat.name = name;
+        if(slugValue) findCat.slug = slugValue;
+        if (categoryImgUrl) findCat.categoryImg = categoryImgUrl
         await findCat.save();
 
         const songs = await SongModel.find({ category: { $in: [oldCategory] } });

@@ -269,12 +269,68 @@ export async function logout(req, res) {
     }
 }
 
-export async function deleteAll(req, res) {
-    try {
-        const deleteAll = await UserModel.deleteMany()
+export async function verifyToken(req, res) {
+    const accessToken = req.cookies.apostolicadminaccesstoken;
+    const refreshToken = req.cookies.apostolicadmintoken;
 
-        res.status(200).json({ success: true, data: 'User Deleted'})
+    try {
+        if (accessToken) {
+            try {
+                // Validate the access token
+                const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+                const user = await UserModel.findById(decoded.id);
+                
+                if(user){
+                    return res.status(403).json({ success: false, data: 'Unauthenticated' });
+                }
+                return res.status(200).json({ success: true, data: 'Authenticated' })
+            } catch (error) {
+                if (error.name !== 'TokenExpiredError') {
+                    return res.status(403).json({ success: false, data: 'Unauthenticated' });
+                }
+                // If TokenExpiredError, fall through to handle the refresh token
+            }
+        }
+    
+        // Handle missing or expired access token
+        if (refreshToken) {
+            try {
+                const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_SECRET);
+                const user = await UserModel.findById(decodedRefresh.id);
+                if (!user) {
+                    return res.status(403).json({ success: false, data: 'Unauthenticated' });
+                }
+    
+                // Generate a new access token
+                const newAccessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+                res.cookie('apostolicaccesstoken', newAccessToken, {
+                    httpOnly: true,
+                    sameSite: 'None',
+                    secure: true,
+                    maxAge: 15 * 60 * 1000, // 15 minutes
+                });
+                return res.status(200).json({ success: true, data: 'Authenticated' })
+                
+            } catch (refreshError) {
+                return res.status(403).json({ success: false, data: 'Unauthenticated' });
+            }
+        }
+    
+        // Both tokens are invalid or missing
+        return res.status(401).json({ success: false, data: 'Authentication required' });
     } catch (error) {
-        console.log('ERROR', error)
+        console.log('UNABLE TO VERIFY USER TOKEN', error)
+        res.status(500).json({ success: false, data: 'Unable to verify token' })
     }
 }
+/**
+ export async function deleteAll(req, res) {
+     try {
+         const deleteAll = await UserModel.deleteMany()
+ 
+         res.status(200).json({ success: true, data: 'User Deleted'})
+     } catch (error) {
+         console.log('ERROR', error)
+     }
+ }
+ */

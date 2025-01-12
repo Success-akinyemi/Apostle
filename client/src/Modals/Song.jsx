@@ -2,7 +2,7 @@ import { SlClose } from "react-icons/sl";
 import LoadingBtn from "../Components/LoadingBtn";
 import Button from "../Components/Button";
 import { useEffect, useState } from "react";
-import { useFetchCategories, useFetchSongs } from "../Helpers/fetch";
+import { useFetchCategories, useFetchSongData, useFetchSongs } from "../Helpers/fetch";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import toast from "react-hot-toast";
@@ -12,7 +12,7 @@ import Spinner from "../Components/Spinner";
 function Song({ setSelectedCard, closePopup, songId }) {
   const { isFetching: fetchingCategories, data: categoriesData } = useFetchCategories();
   const cat = categoriesData?.data;
-  const { data: songsData, isFetching: fetchingSongs } = useFetchSongs(songId);
+  const { data: songsData, isFetching: fetchingSongs } = useFetchSongData(songId);
   const data = songsData?.data;
 
 

@@ -31,7 +31,7 @@ function CategoryPage({ setSelectedCard, setCategoryId, setSongId }) {
             <div className="flex mt-12 items-center gap-12 justify-between">
 
                 <div className="flex flex-[3] w-full mb-8">
-                    <CategoryList data={cat} loading={fetchingCategories} setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} />
+                    <CategoryList data={cat} loading={fetchingCategories} setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} style={`!min-h-[100vh]`} cardStyle={`!min-h-[100vh]`} />
                 </div>
             </div>
         </div>

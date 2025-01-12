@@ -1,24 +1,21 @@
+import { useState, useRef } from "react";
 import { FaEdit } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
 import Spinner from "./Spinner";
 import toast from "react-hot-toast";
 import { deleteSong } from "../Helpers/apis";
-import { useState } from "react";
 
 function SongList({ data, loading: loadingData, setSelectedCard, setSongId }) {
-
   const [loading, setLoading] = useState(false);
+  const audioRef = useRef(null); // Reference to the currently playing audio
+
   const handleDelete = async (id) => {
-    if (loading) {
-      return;
-    }
-    const confirm = window.confirm(
-      "Are you sure you want to delete this song"
-    );
+    if (loading) return;
+    const confirm = window.confirm("Are you sure you want to delete this song");
     if (confirm) {
       try {
         setLoading(true);
-        const res = await deleteSong({ id: id });
+        const res = await deleteSong({ id });
         if (res.success) {
           toast.success(res.data);
           window.location.reload();
@@ -37,14 +34,27 @@ function SongList({ data, loading: loadingData, setSelectedCard, setSongId }) {
     setSelectedCard("song");
   };
 
+  const handlePlay = (audioElement) => {
+    if (audioRef.current && audioRef.current !== audioElement) {
+      audioRef.current.pause(); // Pause the previously playing audio
+    }
+    audioRef.current = audioElement; // Set the current playing audio
+    audioElement.play();
+  };
+
+  const handlePause = (audioElement) => {
+    if (audioRef.current === audioElement) {
+      audioRef.current = null; // Clear the reference when audio is paused
+    }
+  };
+
   function truncateText(text, maxLength, ellipsis = true) {
-    if (text.length <= maxLength) return text; 
+    if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + (ellipsis ? '...' : '');
   }
 
   return (
     <div className="w-full rounded-[8px] overflow-hidden max-h-[100vh] border-[3px] border-primary-color">
-      {/* Header */}
       <div className="flex w-full p-3 bg-primary-color">
         <h2 className="h2 text-white">Song List</h2>
       </div>
@@ -55,14 +65,11 @@ function SongList({ data, loading: loadingData, setSelectedCard, setSongId }) {
             <Spinner style={`!text-[40px]`} />
           </div>
         ) : (
-          // Render Songs
-
           <div>
-            {/**Song details */}
             <div className="flex items-center gap-3">
               <table className="w-full tablet:overflow-x-auto">
-                <thead className="w-full">
-                  <tr className="w-full tablet:px-4 flex items-center justify-between">
+                <thead>
+                  <tr className="flex items-center justify-between">
                     <th className="flex flex-1 text-center">Title</th>
                     <th className="flex flex-1 text-center tablet:hidden">Author</th>
                     <th className="flex flex-1 text-center tablet:hidden">ID</th>
@@ -75,30 +82,31 @@ function SongList({ data, loading: loadingData, setSelectedCard, setSongId }) {
                   {data?.map((i, index) => (
                     <tr
                       key={index}
-                      className={`flex items-center justify-between py-2 gap-3 border-b-[1px] tablet:px-3 ${
+                      className={`flex items-center justify-between py-2 gap-3 border-b-[1px] ${
                         index === data.length - 1 ? "border-b-0" : ""
                       }`}
                     >
-                      <td className="flex flex-1 text-center tablet:text-[14px]">{truncateText(i?.title, 20)}</td>
+                      <td className="flex flex-1 text-center">{truncateText(i?.title, 20)}</td>
                       <td className="flex flex-1 text-center tablet:hidden">{truncateText(i?.author, 15)}</td>
                       <td className="flex flex-1 text-center tablet:hidden">{i.trackId}</td>
                       <td className="flex flex-1 text-center">
-                        <audio controls src={i.trackUrl} />
+                        <audio
+                          src={i.trackUrl}
+                          controls
+                          onPlay={(e) => handlePlay(e.target)}
+                          onPause={(e) => handlePause(e.target)}
+                        />
                       </td>
                       <td className="flex flex-1 text-end justify-end">
                         <div className="flex items-center gap-[5px]">
-                          <div
+                          <FaEdit
                             onClick={() => handleUpdateSongs(i?.trackId)}
-                            className="cursor-pointer"
-                          >
-                            <FaEdit className="text-[20px] text-success" />
-                          </div>
-                          <div
+                            className="text-[20px] text-success cursor-pointer"
+                          />
+                          <AiFillDelete
                             onClick={() => handleDelete(i?.trackId)}
-                            className="cursor-pointer"
-                          >
-                            <AiFillDelete className="text-[20px] text-error" />
-                          </div>
+                            className="text-[20px] text-error cursor-pointer"
+                          />
                         </div>
                       </td>
                     </tr>

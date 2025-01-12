@@ -40,7 +40,7 @@ function Signup() {
   return (
     <div className="page items-center justify-center">
         <div className="w-[500px] bg-white pad rounded-[10px] phone:w-[90%] flex flex-col gap-8">
-            <h1 className="text-center text-[28px] text-primary-color font-semibold" >Apostle Music App</h1>
+            <h1 className="text-center text-[28px] text-primary-color font-semibold" >Apostles Music App</h1>
             <div className="inputGroup">
                 <label className="label">Name</label>
                 <input type="text" id="name" onChange={handleChange} className="input" placeholder="Enter Full Name" />

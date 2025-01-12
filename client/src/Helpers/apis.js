@@ -45,7 +45,12 @@ export async function logout(formData){
 //new category
 export async function newCategory(formData){
     try {
-        const res = await axios.post('/category/createCategory', formData, {withCredentials: true})
+        const res = await axios.post('/category/createCategory', formData, 
+            {
+                withCredentials: true,
+                headers: { "Content-Type": "multipart/form-data" }
+            }
+        )
         if(res.data.success){
             return res.data
         }
@@ -57,8 +62,13 @@ export async function newCategory(formData){
 
 export async function updateCategory(formData){
     try {
-        const res = await axios.post('/category/updateCategory', formData, {withCredentials: true})
-        if(res.data.success){
+        const res = await axios.post('/category/updateCategory', formData, 
+            {
+                withCredentials: true,
+                headers: { "Content-Type": "multipart/form-data" }
+            }
+        )
+        if(res.data){
             return res.data
         }
     } catch (error) {

@@ -15,7 +15,7 @@ router.post('/verifyToken', controllers.verifyToken)
 router.post('/logout', controllers.logout)
 
 
-router.post('/deleteAll', controllers.deleteAll)
+//router.post('/deleteAll', controllers.deleteAll)
 
 
 //PUT ROUTES

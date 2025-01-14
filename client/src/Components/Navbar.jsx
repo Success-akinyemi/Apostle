@@ -26,7 +26,7 @@ function Navbar() {
     }
   return (
     <nav className="fixed z-[999] top-0 left-0 w-full h-[65px] bg-primary-color flex items-center justify-between px-10 tablet:px-6 py-6 phone:px-4 ">
-        <h1 className='uppercase text-white font-semibold text-[35px] tablet:text-[24px] phone:text-[20px]'>Apostolic</h1>
+        <h1 className='uppercase text-white font-semibold text-[35px] tablet:text-[24px] phone:text-[20px]'>APOSTLES</h1>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">

@@ -41,6 +41,10 @@ const SongSchema = new mongoose.Schema({
     lyrics: {
         type: String
     },
+    lyricsNoteImg: {
+        type: [String],
+        default: [],
+    },
     likes: {
         type: Array
     }

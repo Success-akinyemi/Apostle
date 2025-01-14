@@ -77,7 +77,11 @@ export async function newSong(req, res) {
       console.log('MUSIC ID>>', trackId);
 
       //covert artists to an array
-      const artistArray = convertArtistsToArray(artists);
+      const a = artists?.split(',')
+      let artistArray
+      if(a){
+        artistArray = convertArtistsToArray(artists);
+      }
   
       const newSong = await SongModel.create({
         title,
@@ -90,7 +94,7 @@ export async function newSong(req, res) {
         trackImg: imageUploadUrl,
         category,
         lyrics,
-        artists: artistArray
+        artists: artistArray || artists
       });
   
       console.log('SONG UPLOADED SUCCESSFUL');
@@ -151,7 +155,13 @@ export async function updateSong(req, res) {
         let newArtist
         if(artists){
           //convetr artists to array
-          newArtist = convertArtistsToArray(artists);
+          const a = artists?.split(',')
+          let artistArray
+          if(a){
+            artistArray = convertArtistsToArray(artists);
+          }
+  
+          newArtist = artistArray || artists;
         }
 
         if (title) getSong.title = title

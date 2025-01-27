@@ -1,26 +1,21 @@
 import cloudinary from "cloudinary";
 import multer from "multer";
-import fs from "fs";
 import SongModel from "../model/Song.js";
-import { generateUniqueCode, shuffleArray } from "../middleware/utils.js";
-import CategoryModel from "../model/Categories.js";
-import RecentPlaysModel from "../model/RecentPlays.js";
+import { generateUniqueCode } from "../middleware/utils.js";
+import fs from "fs";
+import { PassThrough } from "stream";
 
+// Configure Cloudinary
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
+  timeout: 120000, // 120 seconds
 });
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
 
+// Configure Multer
+const storage = multer.memoryStorage(); // Use memory storage for direct streaming
 const upload = multer({ storage });
 
 export const uploadMiddleware = upload.fields([
@@ -29,158 +24,135 @@ export const uploadMiddleware = upload.fields([
   { name: "trackImg", maxCount: 1 },
 ]);
 
+// Convert Artists to Array
 function convertArtistsToArray(artistString) {
-  return artistString.split(',').map(artist => artist.trim());
+  return artistString.split(",").map((artist) => artist.trim());
 }
 
+// Helper for uploading files to Cloudinary
+function uploadToCloudinary(fileBuffer, folder, resourceType) {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.v2.uploader.upload_stream(
+      { folder, resource_type: resourceType },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+
+    const bufferStream = new PassThrough();
+    bufferStream.end(fileBuffer); // End the stream with the buffer
+    bufferStream.pipe(uploadStream); // Pipe the buffer to the Cloudinary stream
+  });
+}
+
+// Create New Song
 export async function newSong(req, res) {
-    const { title, description, duration, category, lyrics, author, artists } = req.body;
-    const { previewUrl, trackUrl, trackImg } = req.files || {}; 
-  
-    try {
-      let previewUploadUrl = '';
-      let trackUploadUrl = '';
-      let imageUploadUrl = '';
-  
-      // Upload Preview URL (Audio) if provided
-      if (previewUrl && previewUrl[0]?.path) {
-        const previewUpload = await cloudinary.v2.uploader.upload(previewUrl[0]?.path, {
-          resource_type: "video",
-          folder: "music/previews",
-        });
-        previewUploadUrl = previewUpload.secure_url;
-        fs.unlinkSync(previewUrl[0].path);
-      }
-  
-      // Upload Track URL (Audio) if provided
-      if (trackUrl && trackUrl[0]?.path) {
-        const trackUpload = await cloudinary.v2.uploader.upload(trackUrl[0]?.path, {
-          resource_type: "video",
-          folder: "music/tracks",
-        });
-        trackUploadUrl = trackUpload.secure_url;
-        fs.unlinkSync(trackUrl[0].path);
-      }
-  
-      // Upload Track Image (Image) if provided
-      if (trackImg && trackImg[0]?.path) {
-        const imageUpload = await cloudinary.v2.uploader.upload(trackImg[0]?.path, {
-          resource_type: "image",
-          folder: "music/images",
-        });
-        imageUploadUrl = imageUpload.secure_url;
-        fs.unlinkSync(trackImg[0].path);
-      }
-  
-      const generatedMusicId = await generateUniqueCode(6);
-      const trackId = `APOMUS${generatedMusicId}`;
-      console.log('MUSIC ID>>', trackId);
+  const { title, description, duration, category, lyrics, author, artists } = req.body;
+  const { previewUrl, trackUrl, trackImg } = req.files || {};
 
-      //covert artists to an array
-      const a = artists?.split(',')
-      let artistArray
-      if(a){
-        artistArray = convertArtistsToArray(artists);
-      }
-  
-      const newSong = await SongModel.create({
-        title,
-        author,
-        trackId,
-        description,
-        duration,
-        previewUrl: previewUploadUrl,
-        trackUrl: trackUploadUrl,
-        trackImg: imageUploadUrl,
-        category,
-        lyrics,
-        artists: artistArray || artists
-      });
-  
-      console.log('SONG UPLOADED SUCCESSFUL');
-      res.status(201).json({ success: true, data: 'New Song successfully added to database' });
-    } catch (error) {
-      console.error("UNABLE TO CREATE NEW SONG", error);
-      res.status(500).json({ success: false, data: "Unable to create new song" });
+  try {
+    const uploadPromises = [];
+
+    let previewUploadUrl = null;
+    if (previewUrl?.[0]) {
+      console.log("Uploading preview...");
+      previewUploadUrl = await uploadToCloudinary(previewUrl[0].buffer, "music/previews", "video");
     }
+    
+    let trackUploadUrl = null;
+    if (trackUrl?.[0]) {
+      console.log("Uploading track...");
+      trackUploadUrl = await uploadToCloudinary(trackUrl[0].buffer, "music/tracks", "video");
+    }
+    
+    let imageUploadUrl = null;
+    if (trackImg?.[0]) {
+      console.log("Uploading image...");
+      imageUploadUrl = await uploadToCloudinary(trackImg[0].buffer, "music/images", "image");
+    }
+    
+    // Generate a unique ID for the song
+    const generatedMusicId = await generateUniqueCode(6);
+    const trackId = `APOMUS${generatedMusicId}`;
+    const artistArray = artists ? convertArtistsToArray(artists) : [];
+
+    const newSong = await SongModel.create({
+      title,
+      author,
+      trackId,
+      description,
+      duration,
+      previewUrl: previewUploadUrl || null,
+      trackUrl: trackUploadUrl || null,
+      trackImg: imageUploadUrl || null,
+      category,
+      lyrics,
+      artists: artistArray,
+    });
+
+    res.status(201).json({ success: true, data: "New Song successfully added to database" });
+  } catch (error) {
+    console.error("Error creating song:", error);
+    res.status(500).json({ success: false, data: "Unable to create new song" });
   }
-  
-//UPDATE SONG
+}
+
+// Update Existing Song
 export async function updateSong(req, res) {
-    const { id, title, description, duration, category, lyrics, author, artists } = req.body;
-    const { previewUrl, trackUrl, trackImg } = req.files || {};
-    try {
-        const getSong = await SongModel.findOne({ trackId: id })
-        if(!getSong){
-            return res.status(404).json({ success: false, data: 'Song noy found'})
-        }
-        if(req.body.trackId){
-            return res.status(403).json({ success: false, data: 'Not Allowed to update "trackId"'})
-        }
+  const { id, title, description, duration, category, lyrics, author, artists } = req.body;
+  const { previewUrl, trackUrl, trackImg } = req.files || {};
 
-        let previewUploadUrl = '';
-        let trackUploadUrl = '';
-        let imageUploadUrl = '';
-    
-        // Upload Preview URL (Audio) if provided
-        if (previewUrl && previewUrl[0]?.path) {
-          const previewUpload = await cloudinary.v2.uploader.upload(previewUrl[0]?.path, {
-            resource_type: "video",
-            folder: "music/previews",
-          });
-          previewUploadUrl = previewUpload.secure_url;
-          fs.unlinkSync(previewUrl[0].path);
-        }
-    
-        // Upload Track URL (Audio) if provided
-        if (trackUrl && trackUrl[0]?.path) {
-          const trackUpload = await cloudinary.v2.uploader.upload(trackUrl[0]?.path, {
-            resource_type: "video",
-            folder: "music/tracks",
-          });
-          trackUploadUrl = trackUpload.secure_url;
-          fs.unlinkSync(trackUrl[0].path);
-        }
-    
-        // Upload Track Image (Image) if provided
-        if (trackImg && trackImg[0]?.path) {
-          const imageUpload = await cloudinary.v2.uploader.upload(trackImg[0]?.path, {
-            resource_type: "image",
-            folder: "music/images",
-          });
-          imageUploadUrl = imageUpload.secure_url;
-          fs.unlinkSync(trackImg[0].path);
-        }
-
-        let newArtist
-        if(artists){
-          //convetr artists to array
-          const a = artists?.split(',')
-          let artistArray
-          if(a){
-            artistArray = convertArtistsToArray(artists);
-          }
-  
-          newArtist = artistArray || artists;
-        }
-
-        if (title) getSong.title = title
-        if (author) getSong.author = author
-        if (description) getSong.description = description
-        if (previewUploadUrl) getSong.previewUrl = previewUploadUrl
-        if (trackUploadUrl) getSong.trackUrl = trackUploadUrl
-        if (imageUploadUrl) getSong.trackImg = imageUploadUrl
-        if (category) getSong.category = category
-        if (lyrics) getSong.lyrics = lyrics
-        if(duration) getSong.duration = duration
-        if(artists) getSong.artists = newArtist
-
-        await getSong.save()
-
-        res.status(200).json({ success: true, data: 'Song updated successful' })
-    } catch (error) {
-        console.log('UNABLE TO UPDATE MUSIC', error)
+  try {
+    const getSong = await SongModel.findOne({ trackId: id });
+    if (!getSong) {
+      return res.status(404).json({ success: false, data: "Song not found" });
     }
+
+    if (req.body.trackId) {
+      return res.status(403).json({ success: false, data: 'Not allowed to update "trackId"' });
+    }
+
+    const uploadPromises = [];
+
+    let previewUploadUrl = null;
+    if (previewUrl?.[0]) {
+      console.log("Uploading preview...");
+      previewUploadUrl = await uploadToCloudinary(previewUrl[0].buffer, "music/previews", "video");
+    }
+    
+    let trackUploadUrl = null;
+    if (trackUrl?.[0]) {
+      console.log("Uploading track...");
+      trackUploadUrl = await uploadToCloudinary(trackUrl[0].buffer, "music/tracks", "video");
+    }
+    
+    let imageUploadUrl = null;
+    if (trackImg?.[0]) {
+      console.log("Uploading image...");
+      imageUploadUrl = await uploadToCloudinary(trackImg[0].buffer, "music/images", "image");
+    }
+    
+    // Update fields
+    if (title) getSong.title = title;
+    if (description) getSong.description = description;
+    if (duration) getSong.duration = duration;
+    if (category) getSong.category = category;
+    if (lyrics) getSong.lyrics = lyrics;
+    if (author) getSong.author = author;
+    if (artists) getSong.artists = convertArtistsToArray(artists);
+
+    if (previewUploadUrl) getSong.previewUrl = previewUploadUrl;
+    if (trackUploadUrl) getSong.trackUrl = trackUploadUrl;
+    if (imageUploadUrl) getSong.trackImg = imageUploadUrl;
+
+    await getSong.save();
+
+    res.status(200).json({ success: true, data: "Song updated successfully" });
+  } catch (error) {
+    console.error("Unable to update song:", error);
+    res.status(500).json({ success: false, data: "An error occurred while updating the song" });
+  }
 }
 
 //GET ALL SONGS

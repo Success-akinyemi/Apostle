@@ -144,15 +144,18 @@ export async function login(req, res) {
     try {
         const getUser = await UserModel.findOne({ email });
         if (!getUser) {
+            console.log('NO USER')
             return res.status(404).json({ success: false, data: 'User with email does not exist' });
         }
 
         const isMatch = await getUser.matchPassword(password);
         if (!isMatch) {
+            console.log('WRONG CREDEN')
             return res.status(401).json({ success: false, data: 'Invalid credentials' });
         }
 
         if (!getUser.verified) {
+            console.log('NOT EXIST')
             const otpExist = await OtpModel.findOne({ email });
             if (!otpExist) {
                 const otpCode = await generateOtp(getUser._id, getUser.email);

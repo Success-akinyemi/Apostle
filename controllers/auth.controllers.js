@@ -136,9 +136,11 @@ export async function resendOtp(req, res) {
 
 export async function login(req, res) {
     const { email, password } = req.body;
+    console.log('LOGIN ENDPOINT 1')
     if(!email || !password){
         return res.json(400).status({ success: false, data: 'Email and Password is required.'})
     }
+    console.log('LOGIN ENDPOINT 2')
     try {
         const getUser = await UserModel.findOne({ email });
         if (!getUser) {
@@ -279,6 +281,7 @@ export async function verifyToken(req, res) {
                 // Validate the access token
                 const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
                 const user = await UserModel.findById(decoded.id);
+                console.log('VERIFY TOKEN ACCESS TOKEN',decoded )
                 
                 if(user){
                     return res.status(403).json({ success: false, data: 'Unauthenticated' });
@@ -300,7 +303,8 @@ export async function verifyToken(req, res) {
                 if (!user) {
                     return res.status(403).json({ success: false, data: 'Unauthenticated' });
                 }
-    
+
+                console.log('VERIFY REFRESH ACCESS TOKEN',decoded )    
                 // Generate a new access token
                 const newAccessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
                 res.cookie('apostolicaccesstoken', newAccessToken, {

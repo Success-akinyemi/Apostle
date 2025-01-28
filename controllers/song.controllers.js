@@ -4,6 +4,7 @@ import SongModel from "../model/Song.js";
 import { generateUniqueCode } from "../middleware/utils.js";
 import fs from "fs";
 import { PassThrough } from "stream";
+import RecentPlaysModel from "../model/RecentPlays.js";
 
 // Configure Cloudinary
 cloudinary.v2.config({

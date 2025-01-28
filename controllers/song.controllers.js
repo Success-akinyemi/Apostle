@@ -83,9 +83,9 @@ export async function newSong(req, res) {
       trackId,
       description,
       duration,
-      previewUrl: previewUploadUrl || null,
-      trackUrl: trackUploadUrl || null,
-      trackImg: imageUploadUrl || null,
+      previewUrl: previewUploadUrl?.secure_url || null,
+      trackUrl: trackUploadUrl?.secure_url || null,
+      trackImg: imageUploadUrl?.secure_url || null,
       category,
       lyrics,
       artists: artistArray,
@@ -142,9 +142,9 @@ export async function updateSong(req, res) {
     if (author) getSong.author = author;
     if (artists) getSong.artists = convertArtistsToArray(artists);
 
-    if (previewUploadUrl) getSong.previewUrl = previewUploadUrl;
-    if (trackUploadUrl) getSong.trackUrl = trackUploadUrl;
-    if (imageUploadUrl) getSong.trackImg = imageUploadUrl;
+    if (previewUploadUrl) getSong.previewUrl = previewUploadUrl?.secure_url;
+    if (trackUploadUrl) getSong.trackUrl = trackUploadUrl?.secure_url;
+    if (imageUploadUrl) getSong.trackImg = imageUploadUrl?.secure_url;
 
     await getSong.save();
 

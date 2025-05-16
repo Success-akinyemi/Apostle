@@ -178,7 +178,7 @@ export async function getAdminAllSongs(req, res) {
           .sort({ updatedAt: -1 })
           .skip((page - 1) * limit)
           .limit(parseInt(limit));
-
+      
       res.status(200).json({
           success: true,
           data: songData,

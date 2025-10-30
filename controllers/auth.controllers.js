@@ -44,25 +44,26 @@ export async function register(req, res) {
         const otpCode = await generateOtp(newUser._id, newUser.email)
         console.log('OTP', otpCode)
 
-        try {
-            await registerMail({
-                username: `${newUser.name}`,
-                userEmail: newUser.email,
-                subject: 'New Account Created',
-                intro: 'Verify your Apostolic App email address',
-                instructions: `Account created Succesful. Enter Otp and verify your Email Address. Your OTP code is: ${otpCode}. Note Otp is Valid for One (1) Hour.`,
-                outro: `If you did not Sign Up, please ignore this email and report.
-                `,
-                otp: otpCode,
-            });
-
-            return res.status(200).json({ success: true, email: newUser?.email, data: `Signup successful check otp code sent to ${newUser.email} to activate account` });
-        } catch (error) {
-            console.log('ERROR SENDING VERIFY OTP EMAIL', error);
+        if(process.env.BUILD_MODE === 'PROD') {
+            try {
+                await registerMail({
+                    username: `${newUser.name}`,
+                    userEmail: newUser.email,
+                    subject: 'New Account Created',
+                    intro: 'Verify your Apostolic App email address',
+                    instructions: `Account created Succesful. Enter Otp and verify your Email Address. Your OTP code is: ${otpCode}. Note Otp is Valid for One (1) Hour.`,
+                    outro: `If you did not Sign Up, please ignore this email and report.
+                    `,
+                    otp: otpCode,
+                });
+    
+                return res.status(200).json({ success: true, email: newUser?.email, data: `Signup successful check otp code sent to ${newUser.email} to activate account` });
+            } catch (error) {
+                console.log('ERROR SENDING VERIFY OTP EMAIL', error);
+            }
+        } else {
+            res.status(201).json({ success: true, data: 'Account created', code: `${otpCode}` })
         }
-
-        res.status(201).json({ success: true, data: 'Account created' })
-        
     } catch (error) {
         console.log('UNABLE TO REGISTER USER', error)
         res.status(500).json({ success: false, data: 'Unable to register new user' })
@@ -109,24 +110,28 @@ export async function resendOtp(req, res) {
         const otpCode = await generateOtp(getUser._id, getUser.email)
         console.log('OTP', otpCode)
 
-        try {
-            await registerMail({
-                username: `${getUser.name}`,
-                userEmail: getUser.email,
-                subject: 'New Account Created',
-                intro: 'Verify your Apostolic App  email address',
-                instructions: `Account created Succesful. Enter Otp and verify your Email Address. Your OTP code is: ${otpCode}. Note Otp is Valid for One (1) Hour.`,
-                outro: `If you did not Sign Up, please ignore this email and report.
-                `,
-                otp: otpCode,
-            });
+        if(process.env.BUILD_MODE === 'PROD') {
+            try {
+                await registerMail({
+                    username: `${getUser.name}`,
+                    userEmail: getUser.email,
+                    subject: 'New Account Created',
+                    intro: 'Verify your Apostolic App  email address',
+                    instructions: `Account created Succesful. Enter Otp and verify your Email Address. Your OTP code is: ${otpCode}. Note Otp is Valid for One (1) Hour.`,
+                    outro: `If you did not Sign Up, please ignore this email and report.
+                    `,
+                    otp: otpCode,
+                });
+    
+                return res.status(200).json({ success: true, email: email, data: `Signup successful check otp code sent to ${email} to activate account` });
+            } catch (error) {
+                console.log('ERROR SENDING VERIFY OTP EMAIL', error);
+            }
 
-            return res.status(200).json({ success: true, email: email, data: `Signup successful check otp code sent to ${email} to activate account` });
-        } catch (error) {
-            console.log('ERROR SENDING VERIFY OTP EMAIL', error);
+        } else {
+            res.status(201).json({ success: true, data: 'Otp sent successful', code: `${otpCode}` })
         }
 
-        res.status(201).json({ success: true, data: 'Otp sent successful' })
         
     } catch (error) {
         console.log('UNABLE TO RESEND OTP', error)
@@ -161,25 +166,35 @@ export async function login(req, res) {
                 const otpCode = await generateOtp(getUser._id, getUser.email);
                 console.log('OTP', otpCode);
 
-                try {
-                    await registerMail({
-                        username: `${getUser.name}`,
-                        userEmail: getUser.email,
-                        subject: 'New Account Created',
-                        intro: 'Verify your Apostolic App email address',
-                        instructions: `Account created successfully. Your OTP code is: ${otpCode}. Note: OTP is valid for One (1) Hour.`,
-                        outro: `If you did not sign up, please ignore this email and report.`,
-                        otp: otpCode,
-                    });
-
+                if(process.env.BUILD_MODE === 'PROD') {
+                    try {
+                        await registerMail({
+                            username: `${getUser.name}`,
+                            userEmail: getUser.email,
+                            subject: 'New Account Created',
+                            intro: 'Verify your Apostolic App email address',
+                            instructions: `Account created successfully. Your OTP code is: ${otpCode}. Note: OTP is valid for One (1) Hour.`,
+                            outro: `If you did not sign up, please ignore this email and report.`,
+                            otp: otpCode,
+                        });
+    
+                        return res.status(200).json({
+                            success: true,
+                            email: getUser.email,
+                            data: `Signup successful. Check OTP sent to ${getUser.email} to activate your account.`,
+                        });
+                    } catch (error) {
+                        console.log('ERROR SENDING VERIFY OTP EMAIL', error);
+                    }
+                } else {
                     return res.status(200).json({
                         success: true,
                         email: getUser.email,
                         data: `Signup successful. Check OTP sent to ${getUser.email} to activate your account.`,
-                    });
-                } catch (error) {
-                    console.log('ERROR SENDING VERIFY OTP EMAIL', error);
+                        code: `${otpCode}`
+                    }); 
                 }
+
             }
         }
 
@@ -201,7 +216,7 @@ export async function login(req, res) {
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
-        const { password: hashedPassword, resetPasswordToken, resetPasswordExpire, ...userData } = getUser._doc;
+        const { password: hashedPassword, resetPasswordToken, resetPasswordExpire, verified, blocked, ...userData } = getUser._doc;
         res.status(200).json({ success: true, token: refreshToken, data: userData });
     } catch (error) {
         console.log('UNABLE TO LOGIN USER', error);
@@ -223,22 +238,27 @@ export async function forgotPassword(req, res) {
         const otpCode = await generateOtp(getUser._id, getUser.email)
         console.log('OTP', otpCode)
 
-        try {
-            await registerMail({
-                username: `${getUser.name}`,
-                userEmail: getUser.email,
-                subject: 'Password Reset Request',
-                intro: '',
-                instructions: `You request for password reset on your account. Your OTP code is: ${otpCode}. Note Otp is Valid for One (1) Hour.`,
-                outro: `If you did not request for password request, please ignore this email and you might consider changing your password.
-                `,
-                otp: otpCode,
-            });
-
-            return res.status(200).json({ success: true, email: getUser?.email, data: `Reset password Otp successful sent to ${getUser.email}.` });
-        } catch (error) {
-            console.log('ERROR SENDING VERIFY OTP EMAIL', error);
+        if(process.env.BUILD_MODE === 'PROD') {
+            try {
+                await registerMail({
+                    username: `${getUser.name}`,
+                    userEmail: getUser.email,
+                    subject: 'Password Reset Request',
+                    intro: '',
+                    instructions: `You request for password reset on your account. Your OTP code is: ${otpCode}. Note Otp is Valid for One (1) Hour.`,
+                    outro: `If you did not request for password request, please ignore this email and you might consider changing your password.
+                    `,
+                    otp: otpCode,
+                });
+    
+                return res.status(200).json({ success: true, email: getUser?.email, data: `Reset password Otp successful sent to ${getUser.email}.` });
+            } catch (error) {
+                console.log('ERROR SENDING VERIFY OTP EMAIL', error);
+            }
+        } else {
+            return res.status(200).json({ success: true, email: getUser?.email, data: `Reset password Otp successful sent to ${getUser.email}.`, code: `${otpCode}` });
         }
+
     } catch (error) {
         console.log('UNABLE TO PROCESS FORGOT PASSWORD REQUEST', error)
         res.status(500).json({ success: false, data: 'Unable to process forgot password requst' })

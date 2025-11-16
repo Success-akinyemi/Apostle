@@ -14,6 +14,7 @@ import userRoute from './routes/user.routes.js';
 import categoryRoute from './routes/categories.routes.js';
 import songRoute from './routes/song.routes.js';
 import PlayListRoute from './routes/playList.routes.js';
+import artistRoute from './routes/artist.routes.js';
 
 
 
@@ -73,6 +74,7 @@ app.use('/api/category', categoryRoute);
 app.use('/api/song', songRoute);
 app.use('/api/admin', adminRoute)
 app.use('/api/playlist', PlayListRoute)
+app.use('/api/artist', artistRoute)
 
 
 

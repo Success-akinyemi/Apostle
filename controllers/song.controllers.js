@@ -52,6 +52,7 @@ function uploadToCloudinary(fileBuffer, folder, resourceType) {
 export async function newSong(req, res) {
   const { title, description, duration, category, lyrics, author, artists } = req.body;
   const { previewUrl, trackUrl, trackImg } = req.files || {};
+    const { _id } = req.user;
 
   try {
     const uploadPromises = [];
@@ -82,6 +83,7 @@ export async function newSong(req, res) {
     const newSong = await SongModel.create({
       title,
       author,
+      userId: _id,
       trackId,
       description,
       duration,
@@ -189,8 +191,10 @@ export async function getAdminAllSongs(req, res) {
   try {
       const { page = 1, limit = 10 } = req.query;
 
+      const { _id } = req.user;
+      const query = { userId: _id };
       const total = await SongModel.countDocuments();
-      const songData = await SongModel.find()
+      const songData = await SongModel.find(query)
           .sort({ updatedAt: -1 })
           .skip((page - 1) * limit)
           .limit(parseInt(limit));

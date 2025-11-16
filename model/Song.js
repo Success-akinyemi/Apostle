@@ -5,6 +5,9 @@ const SongSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Provide a cover image for track']
     },
+    userId: {
+        type: String
+    },
     title: {
         type: String,
         required: [true, 'Song Title is required']

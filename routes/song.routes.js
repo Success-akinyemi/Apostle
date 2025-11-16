@@ -17,6 +17,7 @@ router.post('/handleLike', AuthenticateUser, controllers.handleLike)
 
 //GET ROUTES
 router.get('/getAllSongs', AuthenticateUser, controllers.getAllSongs)
+router.get('/getLikedSongs', AuthenticateUser, controllers.getLikedSongs)
 router.get('/getASongs/:id', AuthenticateUser, controllers.getASongs)
 router.get('/getSongLyrics/:id', AuthenticateUser, controllers.getSongLyrics)
 router.get('/getRecentPlays', AuthenticateUser, controllers.getRecentPlays)

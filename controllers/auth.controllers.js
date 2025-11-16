@@ -1,4 +1,4 @@
-import { registerMail } from "../middleware/sendEmail.js"
+import { activationEmail, forgotPasswordEmail } from "../middleware/emailTemplate.js"
 import { generateOtp } from "../middleware/utils.js"
 import OtpModel from "../model/Otp.js"
 import UserModel from "../model/User.js"
@@ -44,26 +44,13 @@ export async function register(req, res) {
         const otpCode = await generateOtp(newUser._id, newUser.email)
         console.log('OTP', otpCode)
 
-        if(process.env.BUILD_MODE === 'PROD') {
-            try {
-                await registerMail({
-                    username: `${newUser.name}`,
-                    userEmail: newUser.email,
-                    subject: 'New Account Created',
-                    intro: 'Verify your Apostolic App email address',
-                    instructions: `Account created Succesful. Enter Otp and verify your Email Address. Your OTP code is: ${otpCode}. Note Otp is Valid for One (1) Hour.`,
-                    outro: `If you did not Sign Up, please ignore this email and report.
-                    `,
-                    otp: otpCode,
-                });
-    
-                return res.status(200).json({ success: true, email: newUser?.email, data: `Signup successful check otp code sent to ${newUser.email} to activate account` });
-            } catch (error) {
-                console.log('ERROR SENDING VERIFY OTP EMAIL', error);
-            }
-        } else {
-            res.status(201).json({ success: true, data: 'Account created', code: `${otpCode}` })
-        }
+        await activationEmail({
+            name: newUser.name,
+            email: newUser.email,
+            otp: otpCode
+        })
+
+        res.status(201).json({ success: true, data: 'Account created' })
     } catch (error) {
         console.log('UNABLE TO REGISTER USER', error)
         res.status(500).json({ success: false, data: 'Unable to register new user' })
@@ -106,33 +93,16 @@ export async function resendOtp(req, res) {
             const deleteOtp = await OtpModel.findByIdAndDelete({ _id: otpExist._id })
         }
 
-
         const otpCode = await generateOtp(getUser._id, getUser.email)
         console.log('OTP', otpCode)
 
-        if(process.env.BUILD_MODE === 'PROD') {
-            try {
-                await registerMail({
-                    username: `${getUser.name}`,
-                    userEmail: getUser.email,
-                    subject: 'New Account Created',
-                    intro: 'Verify your Apostolic App  email address',
-                    instructions: `Account created Succesful. Enter Otp and verify your Email Address. Your OTP code is: ${otpCode}. Note Otp is Valid for One (1) Hour.`,
-                    outro: `If you did not Sign Up, please ignore this email and report.
-                    `,
-                    otp: otpCode,
-                });
-    
-                return res.status(200).json({ success: true, email: email, data: `Signup successful check otp code sent to ${email} to activate account` });
-            } catch (error) {
-                console.log('ERROR SENDING VERIFY OTP EMAIL', error);
-            }
-
-        } else {
-            res.status(201).json({ success: true, data: 'Otp sent successful', code: `${otpCode}` })
-        }
-
+        await activationEmail({
+            name: getUser.name,
+            email: getUser.email,
+            otp: otpCode
+        })
         
+        res.status(201).json({ success: true, data: 'Otp sent successful', })
     } catch (error) {
         console.log('UNABLE TO RESEND OTP', error)
         res.status(500).json({ success: false, data: 'Unable to resend OTP code' })
@@ -141,11 +111,9 @@ export async function resendOtp(req, res) {
 
 export async function login(req, res) {
     const { email, password } = req.body;
-    console.log('LOGIN ENDPOINT 1')
     if(!email || !password){
         return res.json(400).status({ success: false, data: 'Email and Password is required.'})
     }
-    console.log('LOGIN ENDPOINT 2')
     try {
         const getUser = await UserModel.findOne({ email });
         if (!getUser) {
@@ -166,34 +134,16 @@ export async function login(req, res) {
                 const otpCode = await generateOtp(getUser._id, getUser.email);
                 console.log('OTP', otpCode);
 
-                if(process.env.BUILD_MODE === 'PROD') {
-                    try {
-                        await registerMail({
-                            username: `${getUser.name}`,
-                            userEmail: getUser.email,
-                            subject: 'New Account Created',
-                            intro: 'Verify your Apostolic App email address',
-                            instructions: `Account created successfully. Your OTP code is: ${otpCode}. Note: OTP is valid for One (1) Hour.`,
-                            outro: `If you did not sign up, please ignore this email and report.`,
-                            otp: otpCode,
-                        });
-    
-                        return res.status(200).json({
-                            success: true,
-                            email: getUser.email,
-                            data: `Signup successful. Check OTP sent to ${getUser.email} to activate your account.`,
-                        });
-                    } catch (error) {
-                        console.log('ERROR SENDING VERIFY OTP EMAIL', error);
-                    }
-                } else {
-                    return res.status(200).json({
-                        success: true,
-                        email: getUser.email,
-                        data: `Signup successful. Check OTP sent to ${getUser.email} to activate your account.`,
-                        code: `${otpCode}`
-                    }); 
-                }
+                await activationEmail({
+                    name: getUser.name,
+                    email: getUser.email,
+                    otp: otpCode
+                })
+                return res.status(200).json({
+                    success: true,
+                    email: getUser.email,
+                    data: `Signup successful. Check OTP sent to ${getUser.email} to activate your account.`,
+                }); 
 
             }
         }
@@ -238,27 +188,13 @@ export async function forgotPassword(req, res) {
         const otpCode = await generateOtp(getUser._id, getUser.email)
         console.log('OTP', otpCode)
 
-        if(process.env.BUILD_MODE === 'PROD') {
-            try {
-                await registerMail({
-                    username: `${getUser.name}`,
-                    userEmail: getUser.email,
-                    subject: 'Password Reset Request',
-                    intro: '',
-                    instructions: `You request for password reset on your account. Your OTP code is: ${otpCode}. Note Otp is Valid for One (1) Hour.`,
-                    outro: `If you did not request for password request, please ignore this email and you might consider changing your password.
-                    `,
-                    otp: otpCode,
-                });
-    
-                return res.status(200).json({ success: true, email: getUser?.email, data: `Reset password Otp successful sent to ${getUser.email}.` });
-            } catch (error) {
-                console.log('ERROR SENDING VERIFY OTP EMAIL', error);
-            }
-        } else {
-            return res.status(200).json({ success: true, email: getUser?.email, data: `Reset password Otp successful sent to ${getUser.email}.`, code: `${otpCode}` });
-        }
-
+        forgotPasswordEmail({
+            name: getUser.name,
+            email: getUser.email,
+            otp: otpCode
+        })
+        
+        return res.status(200).json({ success: true, email: getUser?.email, data: `Reset password Otp successful sent to ${getUser.email}.`, });
     } catch (error) {
         console.log('UNABLE TO PROCESS FORGOT PASSWORD REQUEST', error)
         res.status(500).json({ success: false, data: 'Unable to process forgot password requst' })
@@ -306,7 +242,7 @@ export async function verifyToken(req, res) {
                 const user = await UserModel.findById(decoded.id);
                 console.log('VERIFY TOKEN ACCESS TOKEN',decoded )
                 
-                if(user){
+                if(!user){
                     return res.status(403).json({ success: false, data: 'Unauthenticated' });
                 }
                 return res.status(200).json({ success: true, data: 'Authenticated' })

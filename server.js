@@ -60,6 +60,8 @@ app.use('/api-doc', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 
 // Import DB connection
 import './connection/db.js';
+//import './test.js'
+
 
 // Routes
 app.get('/', (req, res) => {

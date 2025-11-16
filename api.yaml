@@ -204,10 +204,44 @@ paths:
         500:
           description: Server Error
 
-  /api/category/getCategory/:categorySlug:
+  /api/category/getCategory/{categorySlug}:
     get:
       summary: Get category
-      description: Get category
+      description: Retrieve a category by its slug
+      parameters:
+        - in: path
+          name: categorySlug
+          required: true
+          schema:
+            type: string
+          description: The slug of the category to retrieve
+      responses:
+        200:
+          description: Success
+        500:
+          description: Server Error
+
+  /api/category/getAllGenre:
+    get:
+      summary: Get all Genre
+      description: Get all Genre
+      responses:
+        200:
+          description: Success
+        500:
+          description: Server Error
+
+  /api/category/getGenre/{genreSlug}:
+    get:
+      summary: Get a genre
+      description: Retrieve a genre by its slug
+      parameters:
+        - in: path
+          name: genreSlug
+          required: true
+          schema:
+            type: string
+          description: The slug of the genre to retrieve
       responses:
         200:
           description: Success
@@ -217,7 +251,22 @@ paths:
   /api/song/getAllSongs:
     get:
       summary: Get all songs
-      description: Get all songs
+      description: Get all songs with pagination
+      parameters:
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page
       responses:
         200:
           description: Success
@@ -303,6 +352,31 @@ paths:
           description: Success
         500:
           description: Server Error         
+
+  /api/song/getLikedSongs:
+    get:
+      summary: Get all liked songs of a user
+      description: Get all liked songs of a user with pagination
+      parameters:
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page
+      responses:
+        200:
+          description: Success
+        500:
+          description: Server Error
 
   /api/song/handleLike:
     post:

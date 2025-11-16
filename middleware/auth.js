@@ -13,6 +13,9 @@ export const AuthenticateUser = async (req, res, next) => {
             // Validate the access token
             const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
             const user = await UserModel.findById(decoded.id);
+            if (!user) {
+                return res.status(403).json({ success: false, data: 'Invalid token' });
+            }
             req.user = user;
             return next();
         } catch (error) {

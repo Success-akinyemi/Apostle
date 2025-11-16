@@ -5,6 +5,7 @@ import { generateUniqueCode } from "../middleware/utils.js";
 import fs from "fs";
 import { PassThrough } from "stream";
 import RecentPlaysModel from "../model/RecentPlays.js";
+import UserModel from "../model/User.js";
 
 // Configure Cloudinary
 cloudinary.v2.config({
@@ -158,14 +159,29 @@ export async function updateSong(req, res) {
 
 //GET ALL SONGS
 export async function getAllSongs(req, res) {
-    try {
-        const songData = await SongModel.find().select('-_id -lyrics -trackUrl -likes')
+  try {
+      const { page = 1, limit = 10 } = req.query;
 
-        res.status(200).json({ success: true, data: songData })
-    } catch (error) {
-        console.log('UNABLE TO GET ALL SONGS', error)
-        res.status(500).json({ success: false, data: 'Unable to get all songs' })
-    }
+      const total = await SongModel.countDocuments();
+
+      const songData = await SongModel.find()
+        .select('-_id -lyrics -trackUrl -likes')
+        .sort({ updatedAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit));
+
+      res.status(200).json({
+          success: true,
+          data: songData,
+          total,
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(total / limit),
+      });
+
+  } catch (error) {
+      console.log('UNABLE TO GET ALL SONGS', error);
+      res.status(500).json({ success: false, data: 'Unable to get all songs' });
+  }
 }
 
 // GET ALL SONGS FOR ADMIN WITH PAGINATION
@@ -496,6 +512,44 @@ export async function handleLike(req, res) {
   }
 }
 
+//GET LIKED SONGS OF USER
+export async function getLikedSongs(req, res) {
+    const { _id } = req.user;
+    const { limit = 10, page = 1 } = req.query;
+
+    try {
+        const perPage = parseInt(limit);
+        const currentPage = parseInt(page);
+
+        // Count total liked songs
+        const total = await SongModel.countDocuments({ likes: _id });
+
+        // Pagination skip index
+        const skip = (currentPage - 1) * perPage;
+
+        // Get songs the user liked
+        const songs = await SongModel.find({ likes: _id })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(perPage);
+
+        return res.status(200).json({
+            success: true,
+            total,
+            page: currentPage,
+            limit: perPage,
+            totalPages: Math.ceil(total / perPage),
+            songs,
+        });
+
+    } catch (error) {
+        console.error("GET LIKED SONGS ERROR:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Unable to get liked songs",
+        });
+    }
+}
 
 //DELETE SONG
 export async function deleteSongs(req, res) {

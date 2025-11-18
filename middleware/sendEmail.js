@@ -8,7 +8,7 @@ const emailAddress = process.env.EMAIL_ADDRESS;
 
 
 const senderInfo = {
-  name: "Spark Borders",
+  name: "Apostles",
   email: emailAddress,
 };
 

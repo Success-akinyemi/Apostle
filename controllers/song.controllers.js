@@ -167,7 +167,7 @@ export async function getAllSongs(req, res) {
       const total = await SongModel.countDocuments();
 
       const songData = await SongModel.find()
-        .select('-_id -lyrics -trackUrl -likes')
+        .select('-_id')
         .sort({ updatedAt: -1 })
         .skip((page - 1) * limit)
         .limit(parseInt(limit));

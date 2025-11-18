@@ -167,7 +167,7 @@ export async function getAllSongs(req, res) {
       const total = await SongModel.countDocuments();
 
       const songData = await SongModel.find()
-        .select('-_id')
+        .select('-_id -userId')
         .sort({ updatedAt: -1 })
         .skip((page - 1) * limit)
         .limit(parseInt(limit));
@@ -188,6 +188,7 @@ export async function getAllSongs(req, res) {
 
 // GET ALL SONGS FOR ADMIN WITH PAGINATION
 export async function getAdminAllSongs(req, res) {
+
   try {
       const { page = 1, limit = 10 } = req.query;
 
@@ -198,6 +199,7 @@ export async function getAdminAllSongs(req, res) {
           .sort({ updatedAt: -1 })
           .skip((page - 1) * limit)
           .limit(parseInt(limit));
+
       
       res.status(200).json({
           success: true,
@@ -220,7 +222,7 @@ export async function getASongs(req, res) {
         if(!id){
             return res.status(400).json({ success: false, data: 'Provide a Id' })
         }
-        const songData = await SongModel.findOne({ trackId: id }).select('-_id -lyrics')
+        const songData = await SongModel.findOne({ trackId: id }).select('-_id -userId')
 
         if(!songData){
             return res.status(404).json({ success: false, data: 'Song with this id does not exist' })

@@ -150,3 +150,51 @@ export async function deleteSong({ id }){
         return res
     }
 }
+
+
+//ARTIST
+export async function deleteArtist({ id }){
+    try {
+        const res = await axios.post('/artist/deleteArtist', { artistId: id }, {withCredentials: true})
+        if(res.data.success){
+            return res.data
+        }
+    } catch (error) {
+        const res = error.response.data || { data: 'Unable to delete artist'}
+        return res
+    }
+}
+
+export async function newArtist(formData){
+    try {
+        const res = await axios.post('/artist/createArtist', formData, 
+            {
+                withCredentials: true,
+                headers: { "Content-Type": "multipart/form-data" }
+            }
+        )
+        if(res.data.success){
+            return res.data
+        }
+    } catch (error) {
+        const res = error.response.data || { data: 'Unable to create new artist'}
+        return res
+    }
+}
+
+export async function updateArtist(formData){
+    try {
+        const res = await axios.post(`/artist/updateArtist/${formData?.artistId}`, formData, 
+            {
+                withCredentials: true,
+                headers: { "Content-Type": "multipart/form-data" }
+            }
+        )
+        if(res.data){
+            return res.data
+        }
+    } catch (error) {
+        const res = error.response.data || { data: 'Unable to update artist'}
+        return res
+    }
+}

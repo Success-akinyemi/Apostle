@@ -10,11 +10,14 @@ import Song from "./Modals/Song"
 import { AuthorizeUser } from './Auth/ProtectRoute'
 import Songs from './Pages/Songs'
 import CategoryPage from './Pages/CategoryPage'
+import Artist from './Pages/Artist'
+import ArtistCard from './Modals/ArtistCard'
 
 function App() {
   const [ selectedCard, setSelectedCard ] = useState()
   const [ categoryId, setCategoryId ] = useState()
   const [ songId, setSongId ] = useState()
+  const [ artistId, setArtistId ] = useState()
 
 
   const closePopup = () => {
@@ -35,6 +38,12 @@ function App() {
         return (
           <div>
             <Song songId={songId} closePopup={closePopup} setSelectedCard={setSelectedCard} />
+          </div>
+        ) 
+      case 'artist' :
+        return (
+          <div>
+            <ArtistCard artistId={artistId} closePopup={closePopup} setSelectedCard={setSelectedCard} />
           </div>
         ) 
     }
@@ -70,6 +79,9 @@ function App() {
           </Route>
           <Route element={<AuthorizeUser />}>
             <Route path="/category" element={<CategoryPage setSongId={setSongId} setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} />} />
+          </Route>
+          <Route element={<AuthorizeUser />}>
+            <Route path="/artist" element={<Artist setArtistId={setArtistId} setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} />} />
           </Route>
         </Routes>
       </BrowserRouter>

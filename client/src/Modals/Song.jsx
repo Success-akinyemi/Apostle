@@ -8,15 +8,31 @@ import "react-quill/dist/quill.snow.css";
 import toast from "react-hot-toast";
 import { newSong, updateSong } from "../Helpers/apis";
 import Spinner from "../Components/Spinner";
+import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 
 function Song({ setSelectedCard, closePopup, songId }) {
   const { isFetching: fetchingCategories, data: categoriesData } = useFetchCategories();
   const cat = categoriesData?.data;
   const { data: songsData, isFetching: fetchingSongs } = useFetchSongData(songId);
   const data = songsData?.data;
-
-
   const [formData, setFormData] = useState({ id: songId ? songId : '', category: [] });
+
+  useEffect(() => {
+  if (data) {
+    setFormData(prev => ({
+      ...prev,
+      title: data.title || "",
+      author: data.author || "",
+      duration: data.duration || "",
+      description: data.description || "",
+      lyrics: data.lyrics || "",
+      artists: data.artists?.join(", ") || "",
+      category: data.category || []        // <-- IMPORTANT
+    }));
+  }
+}, [data]);
+
 
   // Handle input changes
   const handleChange = (e) => {
@@ -29,15 +45,37 @@ function Song({ setSelectedCard, closePopup, songId }) {
   const handleLyrics = (value) => setFormData({ ...formData, lyrics: value });
 
   // Add a category
-  const handleCategory = (e) => {
-    const selectedCategory = e.target.value;
-    if (
-      selectedCategory !== "-- CATEGORY --" &&
-      !formData.category.includes(selectedCategory)
-    ) {
-      setFormData({ ...formData, category: [...formData.category, selectedCategory] });
-    }
-  };
+  {/**
+    const handleCategory = (e) => {
+      const selectedCategory = e.target.value;
+      if (
+        selectedCategory !== "-- CATEGORY --" &&
+        !formData.category.includes(selectedCategory)
+      ) {
+        setFormData({ ...formData, category: [...formData.category, selectedCategory] });
+      }
+    };
+     */}
+
+  // In your component
+const handleCategory = (selectedOptions) => {
+  const selectedValues = selectedOptions
+    ? selectedOptions.map(option => option.value)
+    : [];
+
+  setFormData(prev => ({
+    ...prev,
+    category: Array.from(new Set([...prev.category, ...selectedValues]))
+  }));
+};
+
+
+
+// Convert your categories to react-select format
+const categoryOptions = cat?.map(category => ({
+  value: category.name,
+  label: category.name
+})) || [];
 
   // Remove a category
   const removeCategory = (categoryToRemove) => {
@@ -233,18 +271,21 @@ function Song({ setSelectedCard, closePopup, songId }) {
       />
     </div>
 
+<div className="inputGroup">
+  <label className="label">Select Category</label>
+  <CreatableSelect
+    isMulti
+    options={categoryOptions}
+    value={categoryOptions.filter(option =>
+      formData.category.includes(option.value)
+    )}
+    onChange={handleCategory}
+    placeholder="Search or type to create..."
+    className="react-select-container"
+    classNamePrefix="react-select"
+  />
+</div>
 
-            <div className="inputGroup">
-              <label className="label">Select Category</label>
-              <select onChange={handleCategory} id="category" className="input">
-                <option>-- CATEGORY --</option>
-                {cat?.map((i, idx) => (
-                  <option key={idx} value={i?.name}>
-                    {i?.name}
-                  </option>
-                ))}
-              </select>
-            </div>
 
             {/* Display Selected Categories */}
             <div className="w-full flex flex-wrap gap-2">

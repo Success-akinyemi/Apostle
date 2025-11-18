@@ -31,7 +31,7 @@ function Songs({ setSelectedCard, setCategoryId, setSongId }) {
 
             <div className="flex flex-col pad2 mt-[70px]">
                 {/** Buttons */}
-                <div className="ml-auto mt-[10px] flex items-center gap-3">
+                <div className="ml-auto mt-[10px] flex items-center gap-3 flex-wrap">
                     <div className="flex">
                         <Button onClick={handleHome} text={"Dashboard"} style={`!phone:text-[9px]`} />
                     </div>
@@ -39,7 +39,7 @@ function Songs({ setSelectedCard, setCategoryId, setSongId }) {
                         <Button
                             onClick={() => setSelectedCard("song")}
                             text={"New Song"}
-                            style={`!phone:text-[9px]`}
+                            style={`!phone:text-[9px] !whitespace-nowrap`}
                         />
                     </div>
                 </div>

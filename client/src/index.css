@@ -68,3 +68,24 @@
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: #929292; /* Handle hover color */
 }
+
+
+.react-select-container .react-select__control {
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0;
+}
+
+.react-select-container .react-select__control:hover {
+  border-color: #9ca3af;
+}
+
+.react-select-container .react-select__multi-value {
+  background-color: #dbeafe;
+  border-radius: 9999px;
+}
+
+.react-select-container .react-select__multi-value__label {
+  color: #1e40af;
+  font-size: 0.875rem;
+}

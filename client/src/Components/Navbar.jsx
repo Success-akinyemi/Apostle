@@ -30,8 +30,8 @@ function Navbar() {
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
-            <CgProfile className='text-[24px] text-white' />
-            <p className='text-white'>Hello, <br /> {user?.name}</p>
+            <CgProfile className='text-[24px] text-white phone:hidden' />
+            <p className='text-white text-base phone:text-[13px]'>Hello, <br /> {user?.name}</p>
           </div>
 
           <p onClick={handleLogout} className='text-white cursor-pointer'>Logout</p>

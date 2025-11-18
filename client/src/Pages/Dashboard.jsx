@@ -14,13 +14,10 @@ function Dashboard({ setSelectedCard, setCategoryId, setSongId }) {
     const { isFetching: fetchingCategories, data: categoriesData } = useFetchCategories();
     const cat = categoriesData?.data?.splice(0, 10);
 
-    const handleSong = () => {
-        navigate('/songs')
+    const handleNavigate = ({ page }) => {
+        navigate(`/${page}`)
     }
 
-    const handleCategory = () => {
-        navigate('/category')
-    }
 
     return (
     <div className="flex flex-col">
@@ -28,12 +25,15 @@ function Dashboard({ setSelectedCard, setCategoryId, setSongId }) {
     
         <div className="flex flex-col pad2 mt-[70px]">
             {/**BTN */}
-            <div className="ml-auto mt-[10px] flex items-center gap-3">
+            <div className="ml-auto mt-[10px] flex items-center gap-3 flex-wrap">
                 <div className="flex">
-                    <Button onClick={handleSong} text={'Songs'} />
+                    <Button onClick={() => handleNavigate({ page: 'songs' })} text={'Songs'} />
                 </div>
                 <div className="flex">
-                    <Button onClick={handleCategory} text={'Category'} />
+                    <Button onClick={() => handleNavigate({ page: 'category' })} text={'Category'} />
+                </div>
+                <div className="flex">
+                    <Button onClick={() => handleNavigate({ page: 'artist' })} text={'Artist'} />
                 </div>
             </div>
             

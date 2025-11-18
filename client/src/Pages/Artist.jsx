@@ -2,12 +2,13 @@ import { useNavigate } from "react-router-dom";
 import Button from "../Components/Button"
 import CategoryList from "../Components/CategoryList"
 import Navbar from "../Components/Navbar"
-import { useFetchCategories } from "../Helpers/fetch";
+import { useFetchMyArtist } from "../Helpers/fetch";
+import ArtistList from "../Components/ArtistList";
 
-function CategoryPage({ setSelectedCard, setCategoryId, setSongId }) {
+function Artist({ setSelectedCard, setCategoryId, setArtistId }) {
     const navigate = useNavigate()
-    const { isFetching: fetchingCategories, data: categoriesData } = useFetchCategories();
-    const cat = categoriesData?.data;
+    const { isFetching: fetchingArtist, data: artistData } = useFetchMyArtist();
+    const cat = artistData?.data;
     const handleHome = () => {
         navigate('/dashboard')
     }
@@ -23,7 +24,7 @@ function CategoryPage({ setSelectedCard, setCategoryId, setSongId }) {
                     <Button onClick={handleHome} text={'Dashboard'} style={`!phone:text-[9px]`} />
                 </div>
                 <div className="flex">
-                    <Button onClick={() => setSelectedCard('category')} text={'New Category'}  style={`whitespace-nowrap`}/>
+                    <Button onClick={() => setSelectedCard('artist')} text={'New Artist'}  style={`whitespace-nowrap`}/>
                 </div>
             </div>
             
@@ -31,7 +32,7 @@ function CategoryPage({ setSelectedCard, setCategoryId, setSongId }) {
             <div className="flex mt-12 items-center gap-12 justify-between">
 
                 <div className="flex flex-[3] w-full mb-8">
-                    <CategoryList data={cat} loading={fetchingCategories} setSelectedCard={setSelectedCard} setCategoryId={setCategoryId} style={`!min-h-[100vh]`} cardStyle={`!min-h-[100vh]`} />
+                    <ArtistList data={cat} loading={fetchingArtist} setSelectedCard={setSelectedCard} setArtistId={setArtistId} style={`!min-h-[100vh]`} cardStyle={`!min-h-[100vh]`} />
                 </div>
             </div>
         </div>
@@ -39,4 +40,4 @@ function CategoryPage({ setSelectedCard, setCategoryId, setSongId }) {
   )
 }
 
-export default CategoryPage
+export default Artist

@@ -105,3 +105,29 @@ export function useFetchSongData(query){
 
     return categories
 }
+
+//FETCH CATEGORIES
+export function useFetchMyArtist(query){
+    const [ data, setData] = useState({ isFetching: true, data: null, status: null, serverError: null, })
+    useEffect(() => {
+        const fetchArtist = async () => {
+            try {
+                const { data, status} = !query ? await axios.get(`/artist/getMyArtists`, {withCredentials: true}) : await axios.get(`/artist/getArtistById/${query}`, {withCredentials: true})
+                //console.log('Data from Hooks>>>', data, 'STATUS', status)
+
+                if(status === 200){
+                    setData({ isFetching: false, data: data, status: status, serverError: null})
+                } else{
+                    setData({ isFetching: false, data: null, status: status, serverError: null})
+                }
+            } catch (error) {
+                const errorMsg = error.response.data.data
+                toast.error(errorMsg || 'Request Failed')
+                setData({ isFetching: false, data: null, status: null, serverError: error})
+            }
+        }
+        fetchArtist()
+    }, [query])
+
+    return data
+}

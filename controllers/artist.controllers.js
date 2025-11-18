@@ -193,7 +193,7 @@ export async function getMyArtists(req, res) {
   const { _id } = req.user;
 
   try {
-    const artists = await ArtistModel.find({ userId: _id });
+    const artists = await ArtistModel.find({ userId: _id }).sort({ createdAt: -1 });
 
     return res.status(200).json({ success: true, data: artists });
   } catch (error) {

@@ -163,7 +163,7 @@ export async function login(req, res) {
             httpOnly: true,
             sameSite: 'None',
             secure: true,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 7 days
         });
 
         const { password: hashedPassword, resetPasswordToken, resetPasswordExpire, verified, blocked, ...userData } = getUser._doc;
